@@ -1,0 +1,11 @@
+django==5.0.1
+psycopg2-binary==2.9.9
+python-environ==0.4.54
+django-cors-headers==4.3.1
+django-jazzmin==2.6.0
+drf-yasg==1.21.7
+djangorestframework==3.14.0
+django-filter==23.5
+django-rosetta==0.10.0
+python-telegram-bot==20.7
+aiohttp==3.9.1
