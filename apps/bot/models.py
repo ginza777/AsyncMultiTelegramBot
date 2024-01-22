@@ -18,6 +18,9 @@ class TelegramBot(models.Model):
         self.name = name
         super(TelegramBot, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
+
 
 class TelegramProfile(models.Model):
     bot = models.ForeignKey(TelegramBot, models.CASCADE, null=True)
