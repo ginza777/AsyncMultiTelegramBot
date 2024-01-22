@@ -64,6 +64,7 @@ def message_text(message: Message) -> str:
 async def start(update: Update, context: CallbackContext, tg_user: models.TelegramProfile):
     """Send a message asynchronously when the command /start is issued."""
 
+
     try:
         await update.message.reply_text("Assalomu alaykum, bot ishladi")
     except Exception as e:
