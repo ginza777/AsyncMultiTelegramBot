@@ -11,7 +11,6 @@ async def set_webhook(bot_token):
     await application.bot.set_webhook(f"{webhook_url}/bot/handle_telegram_webhook/{bot_token}")
     print("Webhook set successfully for bot: {}".format((await application.bot.get_me()).username))
 
-
 def get_info(bot_token):
     url = f"https://api.telegram.org/bot{bot_token}/getMe"
     response = requests.post(url)

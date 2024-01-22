@@ -189,6 +189,6 @@ CELERY_TIMEZONE = "Asia/Tashkent"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
+
 # Bot settings
-BOT_TOKEN = env.str("BOT_TOKEN")
 WEBHOOK_URL = env.str("WEBHOOK_URL")
