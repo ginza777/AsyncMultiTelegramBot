@@ -46,8 +46,8 @@ DJANGO_APPS = [
 ]
 
 CUSTOM_APPS = [
-    "apps.bot",
-    "apps.chatgpt",
+    "apps.bot"
+
 
 ]
 

@@ -6,7 +6,7 @@ from django.conf import settings
 import telegram
 import django.core.exceptions
 from utils.bot import set_webhook
-from apps.chatgpt.main import main
+
 
 
 class BotConfig(AppConfig):
