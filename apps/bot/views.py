@@ -3,8 +3,9 @@ import json
 from django.http import JsonResponse
 from django.conf import settings
 from telegram import Update, Bot
-from telegram.ext import Application, CommandHandler, ConversationHandler, PicklePersistence
-from .telegrambot import start
+from telegram.ext import Application, CommandHandler, ConversationHandler, PicklePersistence, filters, MessageHandler
+from .telegrambot import start,prompt
+from apps.chatgpt.telegram_bot import ChatGPTTelegramBot
 
 
 async def setup(token):
@@ -29,6 +30,10 @@ async def setup(token):
         name="conversationbot",
     )
     application.add_handler(conversation_handler)
+    application.add_handler(CommandHandler(
+        'chat', prompt, filters=filters.ChatType.GROUP | filters.ChatType.SUPERGROUP)
+    )
+    application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),prompt))
     await application.initialize()
     return application, bot
 

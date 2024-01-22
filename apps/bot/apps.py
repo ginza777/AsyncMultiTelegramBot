@@ -6,7 +6,7 @@ from django.conf import settings
 import telegram
 import django.core.exceptions
 from utils.bot import set_webhook
-
+from apps.chatgpt.main import main
 
 
 class BotConfig(AppConfig):
@@ -15,6 +15,7 @@ class BotConfig(AppConfig):
 
     def ready(self):
         asyncio.run(self.setup_webhook())
+        # sync_to_async(main)
 
     async def setup_webhook(self):
         try:
