@@ -9,3 +9,4 @@ django-filter==23.5
 django-rosetta==0.10.0
 python-telegram-bot==20.7
 aiohttp==3.9.1
+setuptools-69.0.3
