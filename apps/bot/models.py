@@ -1,5 +1,5 @@
 from django.db import models
-from utils.bot import set_webhook, get_info
+from utils.bot import set_webhook_sync, get_info
 
 
 class Language(models.TextChoices):
@@ -12,7 +12,7 @@ class TelegramBot(models.Model):
     bot_username = models.CharField(max_length=125, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        set_webhook(self.bot_token)
+        set_webhook_sync(self.bot_token)
         username, name = get_info(bot_token=self.bot_token)
         self.bot_username = username
         self.name = name

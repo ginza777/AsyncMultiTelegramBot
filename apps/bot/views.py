@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, ConversationHandler, PicklePersistence, filters, MessageHandler
-from .telegrambot import start
+from .telegrambot import start, chat
 
 async def setup(token):
     persistence_file = os.path.join(settings.BASE_DIR, "media", "state_record", "conversationbot.pickle")
@@ -31,7 +31,7 @@ async def setup(token):
     # application.add_handler(CommandHandler(
     #     'chat', prompt, filters=filters.ChatType.GROUP | filters.ChatType.SUPERGROUP)
     # )
-    # application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),prompt))
+    application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),chat))
     await application.initialize()
     return application, bot
 
