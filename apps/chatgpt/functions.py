@@ -1,10 +1,14 @@
 import uuid
 
 from channels.db import database_sync_to_async
+from telegram import Update
+from telegram.ext import CallbackContext
 
 from apps.bot.models import TelegramProfile
 from apps.chatgpt.models import ChatGptUser
 from django.utils.translation import gettext_lazy as _
+
+from utils.decarators import get_member
 
 HELP_MESSAGE = str(_("""Commands:
 ⚪️ /retry – Regenerate last bot answer
@@ -44,3 +48,6 @@ def create_user(tg_user):
 @database_sync_to_async
 def get_user(tg_user):
     return ChatGptUser.objects.get(user=tg_user)
+@database_sync_to_async
+def get_user_tg(telegram_id):
+    return TelegramProfile.objects.get(telegram_id=telegram_id)

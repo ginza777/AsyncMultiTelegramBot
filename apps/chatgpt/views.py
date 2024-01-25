@@ -1,15 +1,42 @@
 import datetime
-from utils.decarators import get_member
+
+from telegram.constants import ParseMode
+
+
 import logging
-from telegram.ext import  CallbackContext
-from telegram import  Update
 from .functions import  *
 from channels.db import database_sync_to_async
+import io
+import logging
+import asyncio
+import traceback
+import html
+import json
+from datetime import datetime
+import openai
+
+import telegram
+from telegram import (
+    Update,
+    User,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    BotCommand
+)
+from telegram.ext import (
+    Application,
+    ApplicationBuilder,
+    CallbackContext,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    AIORateLimiter,
+    filters
+)
+from telegram.constants import ParseMode, ChatAction
+
 
 logger = logging.getLogger(__name__)
-
-
-
 
 @get_member
 async def start(update: Update, context: CallbackContext, tg_user: TelegramProfile):
@@ -21,9 +48,9 @@ async def start(update: Update, context: CallbackContext, tg_user: TelegramProfi
         else:
             user = await create_user(tg_user)
 
-        user.last_interaction = datetime.datetime.now()
-        user.current_dialog_id = str(uuid.uuid4()) # Assuming start_new_dialog is an asynchronous function
-        await database_sync_to_async(user.save)()  # Save the user asynchronously
+        # user.last_interaction = datetime.now()
+        # user.current_dialog_id = str(uuid.uuid4()) # Assuming start_new_dialog is an asynchronous function
+        # await database_sync_to_async(user.save)()  # Save the user asynchronously
 
         start_message = START_MESSAGE
         help_message = HELP_MESSAGE
@@ -32,6 +59,4 @@ async def start(update: Update, context: CallbackContext, tg_user: TelegramProfi
 
     except Exception as e:
         logger.error(f"Error in start command: {e}")
-
-
 

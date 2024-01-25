@@ -13,8 +13,7 @@ class BotConfig(AppConfig):
     name = 'apps.bot'
 
     def ready(self):
-
-        call_command('migrate', interactive=False)
+        # call_command('migrate', interactive=False)
         asyncio.run(self.setup_webhook())
     async def setup_webhook(self):
         try:
