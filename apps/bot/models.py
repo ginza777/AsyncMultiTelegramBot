@@ -10,7 +10,7 @@ class TelegramBot(models.Model):
     name = models.CharField(max_length=30, null=True, blank=True)
     bot_token = models.CharField(max_length=255)
     bot_username = models.CharField(max_length=125, blank=True, null=True)
-    app_name= models.CharField(max_length=255, blank=True, null=True)
+    app_name= models.CharField(max_length=255)
 
     def save(self, *args, **kwargs):
         set_webhook_sync(self.bot_token)

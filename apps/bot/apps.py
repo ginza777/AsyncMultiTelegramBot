@@ -2,11 +2,10 @@ import asyncio
 import requests.exceptions
 from asgiref.sync import sync_to_async
 from django.apps import AppConfig
-from django.conf import settings
 import telegram
 import django.core.exceptions
 from utils.bot import set_webhook
-
+from django.core.management import call_command
 
 
 class BotConfig(AppConfig):
@@ -14,6 +13,8 @@ class BotConfig(AppConfig):
     name = 'apps.bot'
 
     def ready(self):
+
+        call_command('migrate', interactive=False)
         asyncio.run(self.setup_webhook())
     async def setup_webhook(self):
         try:
