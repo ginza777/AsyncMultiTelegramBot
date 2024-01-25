@@ -15,8 +15,6 @@ class BotConfig(AppConfig):
 
     def ready(self):
         asyncio.run(self.setup_webhook())
-        # sync_to_async(main)
-
     async def setup_webhook(self):
         try:
             bot_tokens =await self.get_bot_tokens()

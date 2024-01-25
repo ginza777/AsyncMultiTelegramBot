@@ -1,51 +1,55 @@
-import os
 import json
+from asgiref.sync import sync_to_async
 from django.http import JsonResponse
-from django.conf import settings
-from telegram import Update, Bot
-from telegram.ext import Application, CommandHandler, ConversationHandler, PicklePersistence, filters, MessageHandler
-from .telegrambot import start, chat
+from telegram import Update
+from apps.bot.models import TelegramBot
 
-async def setup(token):
-    persistence_file = os.path.join(settings.BASE_DIR, "media", "state_record", "conversationbot.pickle")
-    persistence = PicklePersistence(filepath=persistence_file)
-    bot = Bot(token=token)
-    await bot.initialize()
+from apps.chatgpt.bot import setup as setup_chatgpt
+from apps.common.bot import setup as setup_common
 
-    application = Application.builder().token(token).persistence(persistence).build()
 
-    states = {
+@sync_to_async
+def check_bot_token(bot_token):
+    return TelegramBot.objects.filter(bot_token=bot_token).exists()
 
-    }
-    entry_points = [CommandHandler('start', start)]
-    fallbacks = [CommandHandler('start', start)]
 
-    conversation_handler = ConversationHandler(
-        entry_points=entry_points,
-        states=states,
-        fallbacks=fallbacks,
-        persistent=True,
-        name="conversationbot",
-    )
-    application.add_handler(conversation_handler)
-    # application.add_handler(CommandHandler(
-    #     'chat', prompt, filters=filters.ChatType.GROUP | filters.ChatType.SUPERGROUP)
-    # )
-    application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND),chat))
-    await application.initialize()
-    return application, bot
+@sync_to_async
+def get_bot_app_name(bot_token):
+    return TelegramBot.objects.get(bot_token=bot_token).app_name
+
+
+async def token_checker(bot_token):
+    if await check_bot_token(bot_token):
+        print("Bot found...")
+        return JsonResponse({"status": "ok"})
+    else:
+        print("Bot not found...")
+        return JsonResponse({"error": "Bot not found"}, status=404)
+
+
+
+async def setup_choice(bot_token):
+    app_name = await get_bot_app_name(bot_token)
+    if app_name == "setup_chatgpt":
+        print("choiced setup_chatgpt")
+        return setup_chatgpt
+    elif app_name == "setup_common":
+        print("choiced setup_common")
+        return setup_common
 
 
 async def handle_telegram_webhook(request, bot_token):
+    print("handle_telegram_webhook...")
+    print("bot_token: ", bot_token)
+    await token_checker(bot_token)
+    setup = await setup_choice(bot_token)
     try:
         application, bot = await setup(bot_token)
         body = request.body
         data = json.loads(body.decode('utf-8'))
         update = Update.de_json(data, bot)
-
         if update.message and update.message.chat.type == 'private':
             await application.process_update(update)
-
         return JsonResponse({"status": "ok"})
     except json.JSONDecodeError as e:
         print(e)
