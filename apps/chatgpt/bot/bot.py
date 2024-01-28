@@ -28,7 +28,7 @@ from telegram.ext import (
     filters
 )
 from telegram.constants import ParseMode, ChatAction
-from apps.chatgpt.models import ChatGptUser
+from apps.chatgpt.models import ChatGptUser, Dialog
 from utils.decarators import get_member
 from .config import  *
 from .openai_utils import *
@@ -77,12 +77,12 @@ async def register_user_if_not_exists(update: Update, context: CallbackContext, 
     tg_user = await get_user_tg(tg_userid)
     user = await get_user(tg_user)
 
-    if not check_user_exists(tg_user):
-        db.add_new_user(
-            user_id=tg_user.telegram_id,
-            chat_id=update.message.chat_id,
-        )
-        db.start_new_dialog(tg_userid)
+    # if not check_user_exists(tg_user):
+    #     db.add_new_user(
+    #         user_id=tg_user.telegram_id,
+    #         chat_id=update.message.chat_id,
+    #     )
+    #     db.start_new_dialog(tg_userid)
 
     if user.current_model is None:
         db.start_new_dialog(tg_userid)
@@ -152,7 +152,8 @@ async def start_handle(update: Update, context: CallbackContext, tg_user: Telegr
 
     user.last_interaction = datetime.now()
     user.chat_id = update.message.chat_id
-    await database_sync_to_async(user.save)()  # Save the user asynchronously
+    await database_sync_to_async(user.save)()
+    # Save the user asynchronously
     await db.start_new_dialog(user_id)
 
 
@@ -188,7 +189,7 @@ async def retry_handle(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     db.set_user_attribute(user_id, "last_interaction", datetime.now())
 
-    dialog_messages = db.get_dialog_messages(user_id, dialog_id=None)
+    dialog_messages = db.get_dialog_messages(user_id)
     if len(dialog_messages) == 0:
         await update.message.reply_text("No message to retry 🤷‍♂️")
         return
@@ -199,6 +200,7 @@ async def retry_handle(update: Update, context: CallbackContext):
     await message_handle(update, context, message=last_dialog_message["user"], use_new_dialog_timeout=False)
 
 
+@get_member
 async def message_handle(update: Update, context: CallbackContext, message=None, use_new_dialog_timeout=True):
     # check if bot was mentioned (for group chats)
     if not await is_bot_mentioned(update, context):
@@ -215,40 +217,65 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
     if update.message.chat.type != "private":
         _message = _message.replace("@" + context.bot.username, "").strip()
 
-    await register_user_if_not_exists(update, context, update.message.from_user)
+    await register_user_if_not_exists(update, context, update.message.from_user.id)
     if await is_previous_message_not_answered_yet(update, context): return
 
     user_id = update.message.from_user.id
-    chat_mode = db.get_user_attribute(user_id, "current_chat_mode")
+    print(user_id)
+    tg_user=await get_user_tg(user_id)
+    user=await get_user(tg_user)
+    chat_mode = user.current_chat_mode
 
     if chat_mode == "artist":
         await generate_image_handle(update, context, message=message)
         return
 
+    from django.utils import timezone
+
     async def message_handle_fn():
+        print(user_id)
+        tg_user = await get_user_tg(user_id)
+        user = await get_user(tg_user)
+
         # new dialog timeout
         if use_new_dialog_timeout:
-            if (datetime.now() - db.get_user_attribute(user_id, "last_interaction")).seconds >   new_dialog_timeout and len(db.get_dialog_messages(user_id)) > 0:
+            current_time = timezone.now()
+
+            # Check if user.last_interaction is not already an offset-aware datetime
+            if not timezone.is_aware(user.last_interaction):
+                user.last_interaction = timezone.make_aware(user.last_interaction)
+
+            if (current_time - user.last_interaction).seconds > new_dialog_timeout :
                 db.start_new_dialog(user_id)
-                await update.message.reply_text(f"Starting new dialog due to timeout (<b>{  chat_modes[chat_mode]['name']}</b> mode) ✅", parse_mode=ParseMode.HTML)
-        db.set_user_attribute(user_id, "last_interaction", datetime.now())
+                await update.message.reply_text(
+                    f"Starting new dialog due to timeout (<b>{chat_modes[chat_mode]['name']}</b> mode) ✅",
+                    parse_mode=ParseMode.HTML)
+
+
+        await database_sync_to_async(user.save)()
 
         # in case of CancelledError
         n_input_tokens, n_output_tokens = 0, 0
-        current_model = db.get_user_attribute(user_id, "current_model")
+        tg_user = await get_user_tg(user_id)
+        user = await get_user(tg_user)
+
+        current_model = user.current_model
 
         try:
             # send placeholder message to user
-            placeholder_message = await update.message.reply_text("...")
+            placeholder_message = await update.message.reply_text("11...")
 
             # send typing action
             await update.message.chat.send_action(action="typing")
 
-            if _message is None or len(_message) == 0:
+            if _message is None :
                  await update.message.reply_text("🥲 You sent <b>empty message</b>. Please, try again!", parse_mode=ParseMode.HTML)
                  return
+            print("message_handle_fn",user_id)
+            print(user_id)
 
-            dialog_messages = db.get_dialog_messages(user_id, dialog_id=None)
+
+            dialog_messages = sync_to_async(db.get_dialog_messages)(user_id)
             parse_mode = {
                 "html": ParseMode.HTML,
                 "markdown": ParseMode.MARKDOWN
@@ -295,7 +322,7 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
             new_dialog_message = {"user": _message, "bot": answer, "date": datetime.now()}
             db.set_dialog_messages(
                 user_id,
-                db.get_dialog_messages(user_id, dialog_id=None) + [new_dialog_message],
+                db.get_dialog_messages(user_id) + [new_dialog_message],
                 dialog_id=None
             )
 

@@ -48,10 +48,6 @@ async def start(update: Update, context: CallbackContext, tg_user: TelegramProfi
         else:
             user = await create_user(tg_user)
 
-        # user.last_interaction = datetime.now()
-        # user.current_dialog_id = str(uuid.uuid4()) # Assuming start_new_dialog is an asynchronous function
-        # await database_sync_to_async(user.save)()  # Save the user asynchronously
-
         start_message = START_MESSAGE
         help_message = HELP_MESSAGE
         important_message = IMPORTANT_MESSAGE

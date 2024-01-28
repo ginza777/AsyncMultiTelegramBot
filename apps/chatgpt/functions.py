@@ -48,6 +48,8 @@ def create_user(tg_user):
 @database_sync_to_async
 def get_user(tg_user):
     return ChatGptUser.objects.get(user=tg_user)
+
+
 @database_sync_to_async
 def get_user_tg(telegram_id):
     return TelegramProfile.objects.get(telegram_id=telegram_id)

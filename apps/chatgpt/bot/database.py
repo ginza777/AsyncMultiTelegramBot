@@ -1,6 +1,7 @@
 # database.py
 from datetime import datetime
-
+from asgiref.sync import sync_to_async
+from apps.chatgpt.functions import *
 from channels.db import database_sync_to_async
 
 from apps.chatgpt.models import ChatGptUser, Dialog
@@ -70,16 +71,24 @@ class Database:
         user.n_used_tokens = n_used_tokens_dict
         user.save()
 
-    def get_dialog_messages(self, user_id: int, dialog_id: Optional[str] = None):
+
+    def get_dialog_messages(user_id):
+        dialog_id = ChatGptUser.objects.get(user__telegram_id=user_id).current_dialog_id
+        print(user_id, dialog_id)
         if dialog_id is None:
-            dialog_id = self.get_user_attribute(user_id, "current_dialog_id")
+
+            user=ChatGptUser.objects.get(user__telegram_id=user_id)
+            dialog_id = user.current_dialog_id
 
         dialog = Dialog.objects.get(id=dialog_id, user__user__telegram_id=user_id)
         return dialog.messages
 
     def set_dialog_messages(self, user_id: int, dialog_messages: list, dialog_id: Optional[str] = None):
+
+        user=ChatGptUser.objects.get(user__telegram_id=user_id)
+
         if dialog_id is None:
-            dialog_id = self.get_user_attribute(user_id, "current_dialog_id")
+            dialog_id = user.current_dialog_id
 
         dialog = Dialog.objects.get(id=dialog_id, user__user__telegram_id=user_id)
         dialog.messages = dialog_messages

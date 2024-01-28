@@ -13,6 +13,7 @@ from apps.chatgpt.bot.bot import start_handle, help_handle, help_group_chat_hand
 
 async def post_init(application: Application):
     await application.bot.set_my_commands([
+        BotCommand("/start", "Start bot"),
         BotCommand("/new", "Start new dialog"),
         BotCommand("/mode", "Select chat mode"),
         BotCommand("/retry", "Re-generate response for previous query"),
