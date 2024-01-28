@@ -132,16 +132,10 @@ async def is_bot_mentioned(update: Update, context: CallbackContext):
      else:
          return False
 
-
 @get_member
-async def start_handle(update: Update, context: CallbackContext, tg_user: TelegramProfile):
-    print("start_handle")
-    print(tg_user)
-    print(tg_user.telegram_id)
-    user_id=tg_user.telegram_id
+async def start_handle(update: Update, context: CallbackContext,tg_user:TelegramProfile):
     try:
         user_exists = await check_user_exists(tg_user)
-
         if user_exists:
             user = await get_user(tg_user)
         else:
@@ -154,7 +148,7 @@ async def start_handle(update: Update, context: CallbackContext, tg_user: Telegr
     user.chat_id = update.message.chat_id
     await database_sync_to_async(user.save)()
     # Save the user asynchronously
-    await db.start_new_dialog(user_id)
+    await db.start_new_dialog(tg_user.telegram_id)
 
 
 

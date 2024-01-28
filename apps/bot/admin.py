@@ -7,7 +7,8 @@ class TelegramBotAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramProfile)
 class TelegramProfileAdmin(admin.ModelAdmin):
-    list_display = ("id","first_name","last_name","username", "telegram_id", "language", "bot")
-    list_filter = ("bot",)
+    list_display = ("id","first_name","last_name","username", "telegram_id", "language")
+    filter_horizontal = ("bot",)
+
 
 

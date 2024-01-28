@@ -4,7 +4,11 @@ from utils.bot import set_webhook_sync, get_info
 
 class Language(models.TextChoices):
     UZBEK = "uz", "Uzbek"
-
+    ENGLISH = "en", "English"
+    RUSSIAN = "ru", "Russian"
+    SPANISH = "es", "Spanish"
+    FRENCH = "fr", "French"
+    GERMAN = "de", "German"
 
 class TelegramBot(models.Model):
     name = models.CharField(max_length=30, null=True, blank=True)
@@ -28,7 +32,7 @@ class TelegramBot(models.Model):
 
 
 class TelegramProfile(models.Model):
-    bot = models.ForeignKey(TelegramBot, models.CASCADE, null=True)
+    bot = models.ManyToManyField(TelegramBot)
     telegram_id = models.PositiveBigIntegerField()
     first_name = models.CharField(max_length=255, null=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)

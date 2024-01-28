@@ -6,6 +6,7 @@ from apps.bot.models import TelegramBot
 
 from apps.chatgpt.bot_setup import setup as setup_chatgpt
 from apps.common.bot import setup as setup_common
+from utils.decarators import get_member
 
 
 @sync_to_async
