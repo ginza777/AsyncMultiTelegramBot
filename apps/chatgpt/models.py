@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-from apps.bot.models import TelegramProfile
+from apps.bot.models import TelegramProfile, TelegramBot
 
 
 class ChatGptUser(models.Model):
@@ -16,9 +16,8 @@ class ChatGptUser(models.Model):
     user = models.ForeignKey(TelegramProfile, on_delete=models.SET_NULL, verbose_name="Telegram User", null=True,
                              blank=True)
     chat_id = models.BigIntegerField(null=True, blank=True)
-    last_interaction = models.DateTimeField(auto_now=True, null=True, blank=True)
+    last_interaction = models.DateTimeField(auto_now=True)
     first_seen = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    current_dialog_id = models.UUIDField(default=None, null=True, blank=True)
     current_chat_mode = models.CharField(max_length=255, default="assistant")
     current_model = models.CharField(max_length=255, choices=AVAILABLE_TEXT_MODELS_CHOICES,
                                      default=AVAILABLE_TEXT_MODELS_CHOICES[0][0])
@@ -32,6 +31,7 @@ class ChatGptUser(models.Model):
     class Meta:
         verbose_name = "ChatGpt User"
         verbose_name_plural = "ChatGpt Users"
+
 
 
 class Dialog(models.Model):
@@ -49,15 +49,26 @@ class Dialog(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     model = models.CharField(max_length=255, choices=AVAILABLE_TEXT_MODELS_CHOICES,
                              default=AVAILABLE_TEXT_MODELS_CHOICES[0][0])
-    messages = models.JSONField(default=list, null=True, blank=True)
+    bot=models.ForeignKey(TelegramBot,on_delete=models.SET_NULL,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Dialog"
         verbose_name_plural = "Dialogs"
 
 
+class Messages_dialog(models.Model):
+    user = models.TextField()
+    assisant = models.TextField()
+    dialog = models.ForeignKey(Dialog,on_delete=models.CASCADE,null=True,blank=True )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class Chat_mode(models.Model):
-    name = models.CharField(max_length=200)
+    key=models.CharField(max_length=200)
+    model_name = models.CharField(max_length=200)
     model_type = models.CharField(max_length=200, null=True, blank=True)
     welcome_message = models.TextField()
     prompt_start = models.TextField(null=True, blank=True)
@@ -66,7 +77,7 @@ class Chat_mode(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.model_name
 
 
 class Config(models.Model):

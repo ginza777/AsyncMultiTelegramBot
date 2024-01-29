@@ -1,10 +1,12 @@
 # database.py
 from datetime import datetime
 from asgiref.sync import sync_to_async
+
+from apps.bot.models import TelegramBot
 from apps.chatgpt.functions import *
 from channels.db import database_sync_to_async
 
-from apps.chatgpt.models import ChatGptUser, Dialog
+from apps.chatgpt.models import ChatGptUser, Dialog, Messages_dialog
 from django.utils import timezone
 from typing import Optional, Any
 
@@ -19,7 +21,6 @@ class Database:
             chat_id=chat_id,
             last_interaction=timezone.now(),
             first_seen=timezone.now(),
-            current_dialog_id=None,
             current_chat_mode="assistant",
             current_model="available_text_models"[0],
             n_used_tokens={},
@@ -29,22 +30,27 @@ class Database:
         user.save()
 
     @database_sync_to_async
-    def start_new_dialog(self, user_id: int):
-        user = ChatGptUser.objects.get(user__telegram_id=user_id)
+    def start_new_dialog(self, user_id: int,bot):
+        bot=TelegramBot.objects.get(bot_username=bot)
+        user=ChatGptUser.objects.get(user__telegram_id=user_id,user__bot=bot)
+        if Dialog.objects.filter(user=user,bot=bot).exists():
+            print("if dialog start_new_dialog")
+            dialog_id = Dialog.objects.get(user=user,bot=bot).id
+        else:
+            print("else dialog start_new_dialog")
+            dialog = Dialog.objects.create(
+                user=user,
+                chat_mode=user.current_chat_mode,
+                start_time=timezone.now(),
+                model=user.current_model,
+                bot=bot
+            )
+            dialog.save()
+            print(dialog.id)
+            user.save()
+            dialog_id = dialog.id
 
-        dialog = Dialog.objects.create(
-            user=user,
-            chat_mode=user.current_chat_mode,
-            start_time=timezone.now(),
-            model=user.current_model,
-            messages=[]
-        )
-        dialog.save()
-
-        user.current_dialog_id = dialog.id
-        user.save()
-
-        return dialog.id
+        return dialog_id
 
     def get_user_attribute(self, user_id: int, key: str):
         user = ChatGptUser.objects.get(user__telegram_id=user_id)
@@ -71,25 +77,68 @@ class Database:
         user.n_used_tokens = n_used_tokens_dict
         user.save()
 
+    @sync_to_async()
+    def get_dialog_messages(self, user_id,bot,msg:None):
+        bot=TelegramBot.objects.get(bot_username=bot)
+        user=ChatGptUser.objects.get(user__telegram_id=user_id,user__bot=bot)
+        if Dialog.objects.filter(user=user,bot=bot).exists():
+            print("if dialog get_dialog_messages")
+            dialog = Dialog.objects.get(user=user,bot=bot)
+        else:
 
-    def get_dialog_messages(user_id):
-        dialog_id = ChatGptUser.objects.get(user__telegram_id=user_id).current_dialog_id
+            print("else dialog get_dialog_messages")
+            dialog = Dialog.objects.create(
+                user=user,
+                chat_mode=user.current_chat_mode,
+                start_time=timezone.now(),
+                model=user.current_model,
+                bot=bot,
+            )
+
+            dialog.save()
+
+        msg_dialog=Messages_dialog.objects.create(
+            user=msg,
+            assisant="",
+            dialog=dialog
+        ).save()
+        dialog_id = dialog.id
         print(user_id, dialog_id)
-        if dialog_id is None:
 
-            user=ChatGptUser.objects.get(user__telegram_id=user_id)
-            dialog_id = user.current_dialog_id
+        messages = Messages_dialog.objects.filter(dalog=dialog)
 
-        dialog = Dialog.objects.get(id=dialog_id, user__user__telegram_id=user_id)
-        return dialog.messages
+        formatted_messages = [
+            {"user": msg.user, "assistant": msg.assisant}
+            for msg in messages
+        ]
 
-    def set_dialog_messages(self, user_id: int, dialog_messages: list, dialog_id: Optional[str] = None):
+        return formatted_messages
 
-        user=ChatGptUser.objects.get(user__telegram_id=user_id)
 
-        if dialog_id is None:
-            dialog_id = user.current_dialog_id
 
-        dialog = Dialog.objects.get(id=dialog_id, user__user__telegram_id=user_id)
-        dialog.messages = dialog_messages
+
+
+    @sync_to_async()
+    def set_dialog_messages(seld,user_id, new_dialog_messages,bot):
+        bot=TelegramBot.objects.get(bot_username=bot)
+        user=ChatGptUser.objects.get(user__telegram_id=user_id,user__bot=bot)
+        if Dialog.objects.filter(user=user,bot=bot).exists():
+            print("if dialog set_dialog_messages")
+            dialog_id = Dialog.objects.get(user=user,bot=bot).id
+        else:
+            print("else dialog set_dialog_messages")
+            dialog = Dialog.objects.create(
+                user=user,
+                chat_mode=user.current_chat_mode,
+                start_time=timezone.now(),
+                model=user.current_model,
+                bot=bot
+            )
+            dialog.save()
+            print(dialog.id)
+            user.save()
+            dialog_id = dialog.id
+
+        dialog=Dialog.objects.get(id=dialog_id)
+        dialog.messages = dialog.messages + new_dialog_messages
         dialog.save()

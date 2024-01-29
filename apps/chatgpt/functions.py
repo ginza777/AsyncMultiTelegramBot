@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from apps.bot.models import TelegramProfile
-from apps.chatgpt.models import ChatGptUser
+from apps.chatgpt.models import ChatGptUser, Chat_mode, GptModels
 from django.utils.translation import gettext_lazy as _
 
 from utils.decarators import get_member
@@ -36,20 +36,37 @@ def split_text_into_chunks(text, chunk_size):
     return [text[i: i + chunk_size] for i in range(0, len(text), chunk_size)]
 
 
-
 @database_sync_to_async
-def check_user_exists(tg_user):
+def check_user_exists(tg_user) -> bool:
     return ChatGptUser.objects.filter(user=tg_user).exists()
 
-@database_sync_to_async
-def create_user(tg_user):
-    return ChatGptUser.objects.create(user=tg_user)
 
 @database_sync_to_async
-def get_user(tg_user):
+def create_user(tg_user) -> object:
+    return ChatGptUser.objects.create(user=tg_user, chat_id=tg_user.telegram_id).save()
+
+
+@database_sync_to_async
+def get_user(tg_user) -> object:
     return ChatGptUser.objects.get(user=tg_user)
 
 
 @database_sync_to_async
-def get_user_tg(telegram_id):
-    return TelegramProfile.objects.get(telegram_id=telegram_id)
+def get_user_by_id(telegram_id: int) -> object:
+    return ChatGptUser.objects.get(user__telegram_id=telegram_id)
+
+
+async def save_user_async(user):
+    await database_sync_to_async(user.save)()
+
+
+@database_sync_to_async
+def get_chat_mode_name(user_id):
+    user = ChatGptUser.objects.get(user__telegram_id=user_id)
+    model = user.current_chat_mode
+    chat_mode_instance = Chat_mode.objects.get(key=model)
+    return chat_mode_instance.model_name
+
+@database_sync_to_async
+def models():
+    return GptModels.objects.all()
