@@ -111,7 +111,6 @@ class Database:
             {"user": msg.user, "assistant": msg.assisant}
             for msg in messages
         ]
-
         return formatted_messages
 
 
