@@ -1,14 +1,7 @@
-import uuid
-
 from channels.db import database_sync_to_async
-from telegram import Update
-from telegram.ext import CallbackContext
-
-from apps.bot.models import TelegramProfile
-from apps.chatgpt.models import ChatGptUser, Chat_mode, GptModels
+from apps.chatgpt_bot.models import ChatGptUser, Chat_mode, GptModels
 from django.utils.translation import gettext_lazy as _
 
-from utils.decarators import get_member
 
 HELP_MESSAGE = str(_("""Commands:
 ⚪️ /retry – Regenerate last bot answer

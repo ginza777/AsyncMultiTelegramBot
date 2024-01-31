@@ -1,9 +1,8 @@
 import os
 from django.conf import settings
 from telegram import Bot, BotCommand
-from telegram.ext import Application, ConversationHandler, PicklePersistence, CommandHandler, MessageHandler, filters, \
-    AIORateLimiter, ApplicationBuilder, CallbackQueryHandler
-
+from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder
+from apps.chatgpt_bot.bot_functions import start
 
 
 async def post_init(application: Application):
@@ -29,14 +28,14 @@ async def setup(token):
         ApplicationBuilder()
         .token(token)
         .concurrent_updates(True)
-        # .rate_limiter(AIORateLimiter(max_retries=5))
         .http_version("1.1")
         .get_updates_http_version("1.1")
         .post_init(post_init)
+        .persistence(persistence)
         .build()
     )
 
-    # application.add_handler(CommandHandler("start", start_handle))
+    application.add_handler(CommandHandler("start", start))
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
     # application.add_handler(CommandHandler("help", help_handle))
     # application.add_handler(CommandHandler("help_group_chat", help_group_chat_handle))
