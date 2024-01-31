@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from utils.decarators import get_member
-from apps.bot.models import TelegramProfile
+from apps.bot_main_setup.models import TelegramProfile
 import logging
 from telegram.ext import  CallbackContext
 from telegram import  Update

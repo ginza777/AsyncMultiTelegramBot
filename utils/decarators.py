@@ -1,6 +1,6 @@
 from channels.db import database_sync_to_async
 from django.utils.translation import activate
-from apps.bot import models
+from apps.bot_main_setup import models
 
 
 def get_member(func):

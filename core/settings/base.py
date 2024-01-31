@@ -46,11 +46,9 @@ DJANGO_APPS = [
 ]
 
 CUSTOM_APPS = [
-    "apps.bot",
-    "apps.chatgpt",
-    "apps.common"
-
-
+    "apps.common",
+    "apps.bot_main_setup",
+    "apps.chatgpt_bot",
 ]
 
 THIRD_PARTY_APPS = [
@@ -138,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "uz"
+LANGUAGE_CODE = "en"
 
 TIME_ZONE = "Asia/Tashkent"
 USE_I18N = True
@@ -147,6 +145,11 @@ USE_TZ = True
 USE_L10N = True
 LANGUAGES = [
     ("uz", "Uzbek"),
+    ("en", "English"),
+    ("ru", "Russian"),
+    ("es", "Spanish"),
+    ("fr", "French"),
+    ("de", "German"),
 ]
 MODELTRANSLATION_LANGUAGES = ("uz",)
 MODELTRANSLATION_DEFAULT_LANGUAGE = "uz"
@@ -154,7 +157,6 @@ MODELTRANSLATION_FALLBACK_LANGUAGES = ("uz",)
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 # MODEL TRANSLATION CONFIG
 gettext = lambda s: s  # noqa
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -191,7 +193,6 @@ CELERY_TIMEZONE = "Asia/Tashkent"
 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
 
 # Bot settings
 WEBHOOK_URL = env.str("WEBHOOK_URL")

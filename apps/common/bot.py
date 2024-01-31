@@ -2,7 +2,7 @@ import os
 from django.conf import settings
 from telegram import  Bot
 from telegram.ext import Application, ConversationHandler, PicklePersistence, CommandHandler, MessageHandler
-from .views import start
+from apps.common.views import start
 async def setup(token):
     print("common setup process...")
     persistence_file = os.path.join(settings.BASE_DIR, "media", "state_record", "conversationbot.pickle")
