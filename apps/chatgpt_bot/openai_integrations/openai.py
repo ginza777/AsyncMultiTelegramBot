@@ -10,8 +10,9 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
+
 def create_msg(message, answer, user, input_tokens, output_tokens):
-    if Dialog.objects.filter(user=user,end=False).exists():
+    if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
         dialog.input_tokens += input_tokens
         dialog.output_tokens += output_tokens
@@ -36,14 +37,14 @@ def create_msg(message, answer, user, input_tokens, output_tokens):
     return message.msg_token
 
 
-def generate_prompt(user,message):
-    promt=user.current_chat_mode.prompt_start
+def generate_prompt(user, message):
+    promt = user.current_chat_mode.prompt_start
     messages_list = [{"role": "system", "content": promt}]
-    if Dialog.objects.filter(user=user,end=False).exists():
+    if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
-        #get last 3 messages
-        messages=Messages_dialog.objects.filter(dialog=dialog).order_by("created_at")[:3]
-        if messages.count()>0:
+        # get last 3 messages
+        messages = Messages_dialog.objects.filter(dialog=dialog).order_by("created_at")[:3]
+        if messages.count() > 0:
             for msg in messages:
                 messages_list.append({"role": "user", "content": msg.user})
                 messages_list.append({"role": "assistant", "content": msg.bot})
@@ -52,10 +53,6 @@ def generate_prompt(user,message):
     else:
         messages_list.append({"role": "user", "content": message})
         return messages_list
-
-
-
-
 
 
 @sync_to_async
@@ -68,9 +65,8 @@ def send_message_stream(message, model_name, chat_token, promt, user):
 
     answer = None
 
-
-    messages=generate_prompt(user,message)
-    print("messages: ",messages)
+    messages = generate_prompt(user, message)
+    print("messages: ", messages)
     while answer is None:
         if model_name in {"gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-4", "gpt-4-1106-preview"}:
             r_gen = openai.ChatCompletion.create(
