@@ -10,7 +10,7 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
-
+@sync_to_async
 def create_msg(message, answer, user, input_tokens, output_tokens):
     if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
@@ -37,6 +37,7 @@ def create_msg(message, answer, user, input_tokens, output_tokens):
     return message.msg_token
 
 
+@sync_to_async
 def generate_prompt(user, message):
     promt = user.current_chat_mode.prompt_start
     messages_list = [{"role": "system", "content": promt}]
@@ -55,21 +56,28 @@ def generate_prompt(user, message):
         return messages_list
 
 
-@sync_to_async
-def send_message_stream(message, model_name, chat_token, promt, user):
+
+
+
+async def send_message_stream(message, model_name, chat_token,user,update, context, *args, **kwargs):
     openai.api_key = env.str("OPENAI_API_KEY")
 
-    def _postprocess_answer(self, answer):
+    def _postprocess_answer(answer):
         answer = answer.strip()
         return answer
 
     answer = None
 
-    messages = generate_prompt(user, message)
+    messages = await generate_prompt(user, message)
     print("messages: ", messages)
+
+    await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
+    msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....")
+
+
     while answer is None:
         if model_name in {"gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-4", "gpt-4-1106-preview"}:
-            r_gen = openai.ChatCompletion.create(
+            r_gen =  openai.ChatCompletion.create(
                 model=model_name,
                 messages=messages,
                 stream=True,
@@ -81,24 +89,28 @@ def send_message_stream(message, model_name, chat_token, promt, user):
                 request_timeout=60
             )
             answer = ""
+
+
             for r_item in r_gen:
                 delta = r_item.choices[0].delta
                 if "content" in delta:
                     answer += delta.content
+                    if len(answer)>3:
+                        msg=await context.bot.edit_message_text(chat_id=update.message.chat_id, text=answer, message_id=msg.message_id)
 
             model = "gpt-3.5-turbo-0613"
-
             input_message = messages
             output_message = [{"role": "assistant", "content": answer}]
 
-            input_tokens = num_tokens_from_messages(input_message, model_name)
-            output_tokens = num_tokens_from_messages(output_message, model_name)
+            input_tokens = await num_tokens_from_messages(input_message, model_name)
+            output_tokens = await num_tokens_from_messages(output_message, model_name)
 
             print("input_tokens: ", input_tokens)
             print("output_tokens: ", output_tokens)
             print("user: ", message)
-            print("assisant: ", answer)
+            print("assistant: ", answer)
 
-            create_msg(message, answer, user, input_tokens, output_tokens)
+            await create_msg(message, answer, user, input_tokens, output_tokens)
 
-            return answer, chat_token
+            return answer
+

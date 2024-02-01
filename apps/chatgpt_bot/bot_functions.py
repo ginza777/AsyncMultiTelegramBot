@@ -143,11 +143,9 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     chat_token = await get_user_token(chat_gpt_user)
     promt = await get_current_chat_mode(chat_gpt_user)
 
-    res, token = await send_message_stream(text, model_name, chat_token, promt, chat_gpt_user)
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text=res
-    )
+
+
+    await send_message_stream(text, model_name, chat_token, chat_gpt_user,update,context)
 
 
 @get_member

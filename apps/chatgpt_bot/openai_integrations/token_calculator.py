@@ -1,6 +1,7 @@
 import json
 
 import tiktoken
+from asgiref.sync import sync_to_async
 
 
 def _count_tokens_from_prompt(prompt, answer, model="text-davinci-003"):
@@ -11,6 +12,7 @@ def _count_tokens_from_prompt(prompt, answer, model="text-davinci-003"):
     return n_input_tokens, n_output_tokens
 
 
+@sync_to_async
 def num_tokens_from_messages(messages, model):
     """Returns the number of tokens used by a list of messages."""
     try:
