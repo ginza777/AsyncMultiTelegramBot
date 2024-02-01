@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from asgiref.sync import sync_to_async
 
+from apps.chatgpt_bot.models import Dialog
+
 HELP_MESSAGE = str(_("""Commands:
 ⚪️ /retry – Regenerate last bot answer
 ⚪️ /new – Start new dialog
@@ -49,6 +51,15 @@ def get_current_chat_mode(chat_gpt_user):
 def save_custom_language(chat_gpt_user,id):
     chat_gpt_user.language_choice=id
     chat_gpt_user.save()
+
+@sync_to_async
+def new_diaolog(user):
+    if Dialog.objects.filter(user=user,end=False).exists():
+        Dialog.objects.filter(user=user, end=False).update(end=True)
+        return True
+    else:
+        return False
+
 
 
 

@@ -4,7 +4,7 @@ from telegram import Bot, BotCommand
 from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder, CallbackQueryHandler, \
     MessageHandler,filters
 from apps.chatgpt_bot.bot_functions import start, help,show_chat_modes,show_chat_modes_callback_handle,\
-    set_chat_modes_callback_handle,settings_handle,settings_choice_handle,message_handle,language_choice_handle
+    set_chat_modes_callback_handle,settings_handle,settings_choice_handle,message_handle,language_choice_handle,new_dialog_handle
 
 
 async def post_init(application: Application):
@@ -56,7 +56,7 @@ async def setup(token):
     #
     #
     # application.add_handler(CommandHandler("retry", retry_handle))
-    # application.add_handler(CommandHandler("new", new_dialog_handle))
+    application.add_handler(CommandHandler("new", new_dialog_handle))
     # application.add_handler(CommandHandler("cancel", cancel_handle))
     #
     # application.add_handler(MessageHandler(filters.VOICE , voice_message_handle))

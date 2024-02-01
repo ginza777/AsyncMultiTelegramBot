@@ -5,7 +5,7 @@ from telegram import Update
 from apps.chatgpt_bot.buttons.inline_keyboard import get_chat_modes_keyboard, main_setting_keyboard, \
     ai_model_setting_keyboard, language_list_keyboard, back_settings
 from apps.chatgpt_bot.function.functions import HELP_MESSAGE, START_MESSAGE, IMPORTANT_MESSAGE, \
-    get_current_model, get_user_token, get_current_chat_mode, save_custom_language
+    get_current_model, get_user_token, get_current_chat_mode, save_custom_language, new_diaolog
 from apps.chatgpt_bot.function.user_get_or_create import chat_gpt_user
 from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
 from utils.decarators import get_member
@@ -153,13 +153,13 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
 @get_member
 @chat_gpt_user
 async def language_choice_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
-    Language={
-        "uz" : "Uzbek",
-        "en" : "English",
-        "ru" :"Russian",
-        "es" : "Spanish",
-        "fr" :"French",
-        "de":"German",
+    Language = {
+        "uz": "Uzbek",
+        "en": "English",
+        "ru": "Russian",
+        "es": "Spanish",
+        "fr": "French",
+        "de": "German",
     }
 
     query = update.callback_query
@@ -170,3 +170,15 @@ async def language_choice_handle(update: Update, context: CallbackContext, chat_
         text=f"You choice language is {Language[id]} ",
         reply_markup=back_settings()
     )
+
+
+@get_member
+@chat_gpt_user
+async def new_dialog_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
+    status=await new_diaolog(chat_gpt_user)
+    if status:
+        message="You created new dialogue!"
+    else:
+        message="You have not dialogue yet!"
+
+    await update.message.reply_text(message)
