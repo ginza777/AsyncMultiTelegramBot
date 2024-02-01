@@ -25,7 +25,6 @@ class TextModel(models.Model):
         unique_together = ("name", "key")
 
 
-
 class Subscribtion(models.Model):
     name = models.CharField(max_length=200, unique=True)
     price = models.FloatField()
@@ -42,7 +41,6 @@ class Subscribtion(models.Model):
         db_table = "subscribtion"
 
 
-
 class TokenPackage(models.Model):
     name = models.CharField(max_length=200, unique=True)
     price = models.FloatField()
@@ -54,10 +52,9 @@ class TokenPackage(models.Model):
         return self.name
 
     class Meta:
-        verbose_name="Token Package"
-        verbose_name_plural="Token Packages"
-        db_table="token_package"
-
+        verbose_name = "Token Package"
+        verbose_name_plural = "Token Packages"
+        db_table = "token_package"
 
 
 class ChatGptUser(models.Model):
@@ -74,14 +71,20 @@ class ChatGptUser(models.Model):
     n_transcribed_seconds = models.IntegerField(default=0, null=True, blank=True)
     user_allowed = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
-    user_token = models.CharField(max_length=255, null=True, blank=True, default=uuid.uuid4().hex)
+    user_token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        if not self.user_token:
+            self.user_token = uuid.uuid4()
+        super(ChatGptUser, self).save(force_insert, force_update, using, update_fields)
 
     class Meta:
         verbose_name = "ChatGpt User"
         verbose_name_plural = "ChatGpt Users"
-        app_label = "user_data"
 
 
 class Dialog(models.Model):
@@ -98,7 +101,7 @@ class Dialog(models.Model):
         verbose_name = "Dialog"
         verbose_name_plural = "Dialogs"
         db_table = "dialog"
-        app_label = "user_data"
+
 
 class Messages_dialog(models.Model):
     user = models.TextField()
@@ -111,7 +114,6 @@ class Messages_dialog(models.Model):
         verbose_name = "Messages Dialog"
         verbose_name_plural = "Messages Dialogs"
         db_table = "messages_dialog"
-        app_label = "user_data"
 
 
 class Chat_mode(models.Model):
@@ -127,7 +129,6 @@ class Chat_mode(models.Model):
 
     def __str__(self):
         return self.model_name
-
 
     class Meta:
         verbose_name = "Chat Mode"
@@ -155,8 +156,6 @@ class Config(models.Model):
     class Meta:
         verbose_name = "Config"
         verbose_name_plural = "Configs"
-        app_label = "config_database"
-
 
 
 class GptModels(models.Model):
@@ -170,4 +169,3 @@ class GptModels(models.Model):
         verbose_name = "Gpt Model"
         verbose_name_plural = "Gpt Models"
         db_table = "gpt_models"
-

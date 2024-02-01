@@ -62,4 +62,5 @@ class TelegramProfile(models.Model):
         verbose_name = "Telegram Profile"
         verbose_name_plural = "Telegram Profiles"
         db_table = "telegram_profile"
-        app_label="user_data"
+
+

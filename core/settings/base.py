@@ -105,11 +105,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default":{
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
-    "user_data_db": {
+    "default": {
         "ENGINE": env.str("DB_ENGINE"),
         "NAME": env.str("DB_NAME"),
         "USER": env.str("DB_USER"),
@@ -117,13 +113,6 @@ DATABASES = {
         "HOST": env.str("DB_HOST"),
         "PORT": env.str("DB_PORT")
     }
-
-}
-
-DATABASE_ROUTERS = ['core.router.ConfigDatabaseRouter']
-
-DATABASE_APPS_MAPPING = {
-    'user_data': 'user_data_db'
 }
 
 # Password validation
@@ -208,13 +197,3 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 # Bot settings
 WEBHOOK_URL = env.str("WEBHOOK_URL")
 
-
-DARK_THEME_ENABLED = True
-
-# Define the dark theme settings
-if DARK_THEME_ENABLED:
-    THEME_COLOR = '#121212'  # Background color for dark theme
-    TEXT_COLOR = '#ffffff'   # Text color for dark theme
-else:
-    THEME_COLOR = '#ffffff'  # Background color for light theme
-    TEXT_COLOR = '#000000'   # Text color for light theme
