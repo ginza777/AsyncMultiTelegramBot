@@ -91,6 +91,14 @@ class TokenPackage(models.Model):
 
 
 class ChatGptUser(models.Model):
+    class Language(models.TextChoices):
+        UZBEK = "uz", "Uzbek"
+        ENGLISH = "en", "English"
+        RUSSIAN = "ru", "Russian"
+        SPANISH = "es", "Spanish"
+        FRENCH = "fr", "French"
+        GERMAN = "de", "German"
+
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(TelegramProfile, on_delete=models.SET_NULL, verbose_name="Telegram User", null=True,
                              blank=True)
@@ -108,7 +116,7 @@ class ChatGptUser(models.Model):
     user_token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    language_choice=models.CharField(max_length=255, choices=Language.choices, default=Language.UZBEK, null=True)
     def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
     ):

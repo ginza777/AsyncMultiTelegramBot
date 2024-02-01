@@ -42,7 +42,7 @@ def main_setting_keyboard():
     keyboard = []
     for button in button_list:
         keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"main_setting_{button["id"]}")])
-    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"main_setting_0")])
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"delete_setting_back")])
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -51,7 +51,7 @@ def ai_model_setting_keyboard():
     keyboard = []
     for button in button_list:
         keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"ai_model_setting_{button["id"]}")])
-    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"main_setting_back")])
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"setting_back")])
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -67,6 +67,15 @@ def language_list_keyboard():
     keyboard = []
     for button in button_list:
         keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"language_setting_{button["id"]}")])
-    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"main_setting_back")])
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"setting_back")])
 
     return InlineKeyboardMarkup(keyboard)
+
+
+
+def back_settings():
+    keyboard = []
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"setting_back")])
+    return InlineKeyboardMarkup(keyboard)
+
+

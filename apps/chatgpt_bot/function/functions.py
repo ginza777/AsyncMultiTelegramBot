@@ -29,7 +29,10 @@ def split_text_into_chunks(text, chunk_size):
 
 @sync_to_async
 def get_current_model(chat_gpt_user):
-    return chat_gpt_user.current_model.model
+    if chat_gpt_user.current_model.model != "null" or chat_gpt_user.current_model.model is not None:
+        return chat_gpt_user.current_model.model
+    else:
+        return "gpt-3.5-turbo-16k"
 
 
 @sync_to_async
@@ -40,3 +43,13 @@ def get_user_token(chat_gpt_user):
 @sync_to_async
 def get_current_chat_mode(chat_gpt_user):
     return chat_gpt_user.current_chat_mode.prompt_start
+
+
+@sync_to_async
+def save_custom_language(chat_gpt_user,id):
+    chat_gpt_user.language_choice=id
+    chat_gpt_user.save()
+
+
+
+

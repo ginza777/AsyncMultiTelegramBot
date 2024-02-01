@@ -3,13 +3,15 @@ from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 from telegram import Update
 from apps.chatgpt_bot.buttons.inline_keyboard import get_chat_modes_keyboard, main_setting_keyboard, \
-    ai_model_setting_keyboard, language_list_keyboard
+    ai_model_setting_keyboard, language_list_keyboard, back_settings
 from apps.chatgpt_bot.function.functions import HELP_MESSAGE, START_MESSAGE, IMPORTANT_MESSAGE, \
-    get_current_model, get_user_token, get_current_chat_mode
+    get_current_model, get_user_token, get_current_chat_mode, save_custom_language
 from apps.chatgpt_bot.function.user_get_or_create import chat_gpt_user
+from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
 from utils.decarators import get_member
 from apps.chatgpt_bot.models import Chat_mode, ChatGptUser
 from apps.chatgpt_bot.openai_integrations.openai import send_message_stream
+
 
 @get_member
 @chat_gpt_user
@@ -72,13 +74,32 @@ async def set_chat_modes_callback_handle(update: Update, context: CallbackContex
 @get_member
 @chat_gpt_user
 async def settings_handle(update: Update, context: CallbackContext, chat_gpt_user, *args, **kwargs):
-    keyboard = main_setting_keyboard()
-    await context.bot.send_message(
-        chat_id=update.message.chat_id,
-        text="⚙️ Settings:",
-        reply_markup=keyboard,
-        parse_mode=ParseMode.HTML
-    )
+    print("settings_handle")
+    print(update)
+    if update.message and update.message.entities and update.message.entities[0].type == "bot_command":
+        if update.message.text == "/settings":
+            keyboard = main_setting_keyboard()
+            await context.bot.send_message(
+                chat_id=update.message.chat_id,
+                text="⚙️ Settings:",
+                reply_markup=keyboard,
+                parse_mode=ParseMode.HTML
+            )
+
+    if update.callback_query and update.callback_query.data == "setting_back":
+        print("callback_query")
+        print(update.callback_query.data)
+        keyboard = main_setting_keyboard()
+        await update.callback_query.edit_message_text(
+            text="⚙️ Settings:",
+            reply_markup=keyboard,
+        )
+
+    if update.callback_query and update.callback_query.data == "delete_setting_back":
+        print("callback_query")
+        print(update.callback_query.data)
+        keyboard = main_setting_keyboard()
+        await update.callback_query.delete_message()
 
 
 @get_member
@@ -126,4 +147,26 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     await context.bot.send_message(
         chat_id=update.message.chat_id,
         text=res
+    )
+
+
+@get_member
+@chat_gpt_user
+async def language_choice_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
+    Language={
+        "uz" : "Uzbek",
+        "en" : "English",
+        "ru" :"Russian",
+        "es" : "Spanish",
+        "fr" :"French",
+        "de":"German",
+    }
+
+    query = update.callback_query
+    id = query.data.split("language_setting_")[-1]
+    print("custom lang: ", id)
+    await save_custom_language(chat_gpt_user, id)
+    await query.edit_message_text(
+        text=f"You choice language is {Language[id]} ",
+        reply_markup=back_settings()
     )

@@ -4,7 +4,7 @@ from telegram import Bot, BotCommand
 from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder, CallbackQueryHandler, \
     MessageHandler,filters
 from apps.chatgpt_bot.bot_functions import start, help,show_chat_modes,show_chat_modes_callback_handle,\
-    set_chat_modes_callback_handle,settings_handle,settings_choice_handle,message_handle
+    set_chat_modes_callback_handle,settings_handle,settings_choice_handle,message_handle,language_choice_handle
 
 
 async def post_init(application: Application):
@@ -45,6 +45,9 @@ async def setup(token):
     application.add_handler(CallbackQueryHandler(set_chat_modes_callback_handle, pattern="^set_chat_modes"))
     #settings
     application.add_handler(CallbackQueryHandler(settings_choice_handle, pattern="^main_setting_"))
+    application.add_handler(CallbackQueryHandler(language_choice_handle, pattern="^language_setting_"))
+    application.add_handler(CallbackQueryHandler(settings_handle, pattern="^setting_back"))
+    application.add_handler(CallbackQueryHandler(settings_handle, pattern="^delete_setting_back"))
     application.add_handler(CommandHandler("settings", settings_handle))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
 
