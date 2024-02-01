@@ -64,7 +64,7 @@ class ChatGptUser(models.Model):
     chat_id = models.BigIntegerField(null=True, blank=True)
     last_interaction = models.DateTimeField(auto_now=True)
     first_seen = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    current_chat_mode = models.CharField(max_length=255, default="assistant")
+    current_chat_mode = models.ForeignKey(TextModel, on_delete=models.SET_NULL, null=True, blank=True,related_name="current_chat_mode")
     current_model = models.ForeignKey(TextModel, on_delete=models.SET_NULL, null=True, blank=True)
     n_used_tokens = models.PositiveBigIntegerField(null=True, blank=True)
     n_generated_images = models.IntegerField(default=0, null=True, blank=True)

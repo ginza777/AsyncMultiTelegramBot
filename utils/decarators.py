@@ -31,9 +31,7 @@ def get_member(func):
 
             }
         )
-
         if not created:
-
             user.first_name = update.effective_user.first_name
             user.last_name = update.effective_user.last_name
             user.username = update.effective_user.username
@@ -43,7 +41,7 @@ def get_member(func):
         else:
             user.language = selected_language
             await database_sync_to_async(user.bot.add)(bot)
-            await database_sync_to_async(user.asave)()
+            await user.asave()
         activate('en')
         return await func(update, context, user, *args, **kwargs)
 

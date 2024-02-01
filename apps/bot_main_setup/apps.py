@@ -21,7 +21,7 @@ class BotConfig(AppConfig):
     name = 'apps.bot_main_setup'
 
     def ready(self):
-        call_command('migrate', interactive=False)
+        # call_command('migrate', interactive=False)
         asyncio.run(create_superuser())
         asyncio.run(self.setup_webhook())
 

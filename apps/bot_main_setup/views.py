@@ -46,8 +46,9 @@ async def handle_telegram_webhook(request, bot_token):
         body = request.body
         data = json.loads(body.decode('utf-8'))
         update = Update.de_json(data, bot)
-        if update.message and update.message.chat.type == 'private':
-            await application.process_update(update)
+        print(data)
+        await application.process_update(update)
+        print("handle_telegram_webhook done.")
         return JsonResponse({"status": "ok"})
     except json.JSONDecodeError as e:
         print(e)
