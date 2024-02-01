@@ -72,10 +72,7 @@ def language_list_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-
 def back_settings():
     keyboard = []
     keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"setting_back")])
     return InlineKeyboardMarkup(keyboard)
-
-

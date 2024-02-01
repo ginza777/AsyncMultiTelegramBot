@@ -21,11 +21,11 @@ class ChatGptUserAdmin(admin.ModelAdmin):
 
 @admin.register(Dialog)
 class DialogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'chat_mode', 'start_time', 'gpt_model', 'bot')
+    list_display = ('id', 'user', 'chat_mode', 'start_time', 'gpt_model', 'bot','input_tokens', 'output_tokens', 'end')
 
 @admin.register(Messages_dialog)
 class MessagesDialogAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bot', 'dialog', 'created_at', 'updated_at')
+    list_display = ('user', 'bot', 'dialog', 'input_tokens', 'output_tokens')
 
 @admin.register(Chat_mode)
 class ChatModeAdmin(admin.ModelAdmin):

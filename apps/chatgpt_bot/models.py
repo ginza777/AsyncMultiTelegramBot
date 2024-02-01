@@ -116,7 +116,8 @@ class ChatGptUser(models.Model):
     user_token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    language_choice=models.CharField(max_length=255, choices=Language.choices, default=Language.UZBEK, null=True)
+    language_choice = models.CharField(max_length=255, choices=Language.choices, default=Language.UZBEK, null=True)
+
     def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
@@ -132,12 +133,18 @@ class ChatGptUser(models.Model):
 class Dialog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(ChatGptUser, on_delete=models.CASCADE, verbose_name="ChatGpt User")
-    chat_mode = models.CharField(max_length=255, default="assistant")
+    chat_mode = models.ForeignKey(Chat_mode, on_delete=models.SET_NULL, null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
-    gpt_model = models.ForeignKey(TextModel, on_delete=models.SET_NULL, null=True, blank=True)
+    gpt_model = models.ForeignKey(GptModels, on_delete=models.SET_NULL, null=True, blank=True)
     bot = models.ForeignKey(TelegramBot, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    input_tokens = models.IntegerField(default=0)
+    output_tokens = models.IntegerField(default=0)
+    end = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(f"{self.user.chat_id}---{self.id}")
 
     class Meta:
         verbose_name = "Dialog"
@@ -148,9 +155,19 @@ class Dialog(models.Model):
 class Messages_dialog(models.Model):
     user = models.TextField()
     bot = models.TextField()
-    dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE, null=True, blank=True)
+    dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE, null=True, blank=True, related_name="messages_dialog")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    msg_token = models.CharField(max_length=255, null=True, blank=True)
+    input_tokens = models.IntegerField(default=0)
+    output_tokens = models.IntegerField(default=0)
+
+    def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        if not self.msg_token:
+            self.user_token = uuid.uuid4()
+        super(Messages_dialog, self).save(force_insert, force_update, using, update_fields)
 
     class Meta:
         verbose_name = "Messages Dialog"
