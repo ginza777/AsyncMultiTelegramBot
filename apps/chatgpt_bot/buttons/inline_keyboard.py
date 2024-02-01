@@ -4,8 +4,6 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from apps.chatgpt_bot.models import Chat_mode
 
 
-
-
 @sync_to_async
 def get_chat_modes_keyboard(page_index: int = 0, items_per_page: int = 5):
     chat_modes = Chat_mode.objects.all()
@@ -27,12 +25,48 @@ def get_chat_modes_keyboard(page_index: int = 0, items_per_page: int = 5):
 
         pagination_buttons = []
         if not is_first_page:
-            pagination_buttons.append(InlineKeyboardButton("« Previous", callback_data=f"show_chat_modes_{page_index - 1}"))
+            pagination_buttons.append(
+                InlineKeyboardButton("« Previous", callback_data=f"show_chat_modes_{page_index - 1}"))
 
         if not is_last_page:
             pagination_buttons.append(InlineKeyboardButton("Next »", callback_data=f"show_chat_modes_{page_index + 1}"))
 
         if pagination_buttons:
             keyboard.append(pagination_buttons)
+
+    return InlineKeyboardMarkup(keyboard)
+
+
+def main_setting_keyboard():
+    button_list = [{"name": "🧠 AI Model", "id": 1}, {"name": "🇺🇸 Language", "id": 2}, {"name": "👮‍ Your name", "id": 3}]
+    keyboard = []
+    for button in button_list:
+        keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"main_setting_{button["id"]}")])
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"main_setting_0")])
+    return InlineKeyboardMarkup(keyboard)
+
+
+def ai_model_setting_keyboard():
+    button_list = [{"name": "ChatGPT", "id": 1}, {"name": "GPT-4 Turbo", "id": 2}]
+    keyboard = []
+    for button in button_list:
+        keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"ai_model_setting_{button["id"]}")])
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"main_setting_back")])
+    return InlineKeyboardMarkup(keyboard)
+
+
+def language_list_keyboard():
+    button_list = [
+        {"name": "🇺🇿 Uzbek", "id": "uz"},
+        {"name": "🇬🇧 English", "id": "en"},
+        {"name": "🇷🇺 Russian", "id": "ru"},
+        {"name": "🇪🇸 Spanish", "id": "es"},
+        {"name": "🇫🇷 French", "id": "fr"},
+        {"name": "🇩🇪 German", "id": "de"},
+    ]
+    keyboard = []
+    for button in button_list:
+        keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"language_setting_{button["id"]}")])
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"main_setting_back")])
 
     return InlineKeyboardMarkup(keyboard)

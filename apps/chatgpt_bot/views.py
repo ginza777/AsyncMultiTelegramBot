@@ -2,7 +2,7 @@ import os
 from django.conf import settings
 from telegram import Bot, BotCommand
 from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder, CallbackQueryHandler
-from apps.chatgpt_bot.bot_functions import start, help,show_chat_modes,show_chat_modes_callback_handle,set_chat_modes_callback_handle
+from apps.chatgpt_bot.bot_functions import start, help,show_chat_modes,show_chat_modes_callback_handle,set_chat_modes_callback_handle,settings_handle,settings_choice_handle
 
 
 async def post_init(application: Application):
@@ -41,7 +41,9 @@ async def setup(token):
     application.add_handler(CommandHandler("mode", show_chat_modes))
     application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))
     application.add_handler(CallbackQueryHandler(set_chat_modes_callback_handle, pattern="^set_chat_modes"))
-
+    #settings
+    application.add_handler(CallbackQueryHandler(settings_choice_handle, pattern="^main_setting_"))
+    application.add_handler(CommandHandler("settings", settings_handle))
 
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
 
@@ -53,12 +55,8 @@ async def setup(token):
     # application.add_handler(CommandHandler("cancel", cancel_handle))
     #
     # application.add_handler(MessageHandler(filters.VOICE , voice_message_handle))
-    #
 
 
-    # application.add_handler(CallbackQueryHandler(set_chat_mode_handle, pattern="^set_chat_mode"))
-    #
-    # application.add_handler(CommandHandler("settings", settings_handle))
     # application.add_handler(CallbackQueryHandler(set_settings_handle, pattern="^set_settings"))
     #
     # application.add_handler(CommandHandler("balance", show_balance_handle))
