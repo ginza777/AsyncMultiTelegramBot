@@ -2,10 +2,11 @@ import os
 from django.conf import settings
 from telegram import Bot, BotCommand
 from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder
-from apps.chatgpt_bot.bot_functions import start
+from apps.chatgpt_bot.bot_functions import start,help
 
 
 async def post_init(application: Application):
+    print("post_init function is called.")
     await application.bot.set_my_commands([
         BotCommand("/start", "Start bot"),
         BotCommand("/new", "Start new dialog"),
@@ -36,8 +37,12 @@ async def setup(token):
     )
 
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help))
+
+
+
     # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
-    # application.add_handler(CommandHandler("help", help_handle))
+
     # application.add_handler(CommandHandler("help_group_chat", help_group_chat_handle))
     #
     #

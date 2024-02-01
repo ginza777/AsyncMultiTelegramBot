@@ -196,3 +196,14 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 # Bot settings
 WEBHOOK_URL = env.str("WEBHOOK_URL")
+
+
+DARK_THEME_ENABLED = True
+
+# Define the dark theme settings
+if DARK_THEME_ENABLED:
+    THEME_COLOR = '#121212'  # Background color for dark theme
+    TEXT_COLOR = '#ffffff'   # Text color for dark theme
+else:
+    THEME_COLOR = '#ffffff'  # Background color for light theme
+    TEXT_COLOR = '#000000'   # Text color for light theme

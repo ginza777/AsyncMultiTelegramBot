@@ -12,7 +12,7 @@ def chat_gpt_user(func):
         try:
             chat_gpt_user = await ChatGptUser.objects.aget(user=user)
         except ChatGptUser.DoesNotExist:
-            chat_gpt_user = await ChatGptUser.objects.acreate(user=user, chat_id=update.effective_chat.id)
+            chat_gpt_user = await ChatGptUser.objects.acreate(user=user, chat_id=update.effective_chat.id,)
         chat_gpt_user.last_interaction = timezone.now()
         await chat_gpt_user.asave()
         activate('en')
