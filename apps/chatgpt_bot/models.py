@@ -25,6 +25,7 @@ class TextModel(models.Model):
         unique_together = ("name", "key")
 
 
+
 class Subscribtion(models.Model):
     name = models.CharField(max_length=200, unique=True)
     price = models.FloatField()
@@ -34,6 +35,12 @@ class Subscribtion(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Subscribtion"
+        verbose_name_plural = "Subscribtions"
+        db_table = "subscribtion"
+
 
 
 class TokenPackage(models.Model):
@@ -45,6 +52,12 @@ class TokenPackage(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name="Token Package"
+        verbose_name_plural="Token Packages"
+        db_table="token_package"
+
 
 
 class ChatGptUser(models.Model):
@@ -68,6 +81,7 @@ class ChatGptUser(models.Model):
     class Meta:
         verbose_name = "ChatGpt User"
         verbose_name_plural = "ChatGpt Users"
+        app_label = "user_data"
 
 
 class Dialog(models.Model):
@@ -84,7 +98,7 @@ class Dialog(models.Model):
         verbose_name = "Dialog"
         verbose_name_plural = "Dialogs"
         db_table = "dialog"
-
+        app_label = "user_data"
 
 class Messages_dialog(models.Model):
     user = models.TextField()
@@ -92,6 +106,12 @@ class Messages_dialog(models.Model):
     dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Messages Dialog"
+        verbose_name_plural = "Messages Dialogs"
+        db_table = "messages_dialog"
+        app_label = "user_data"
 
 
 class Chat_mode(models.Model):
@@ -107,6 +127,12 @@ class Chat_mode(models.Model):
 
     def __str__(self):
         return self.model_name
+
+
+    class Meta:
+        verbose_name = "Chat Mode"
+        verbose_name_plural = "Chat Modes"
+        db_table = "chat_mode"
 
 
 class Config(models.Model):
@@ -129,6 +155,8 @@ class Config(models.Model):
     class Meta:
         verbose_name = "Config"
         verbose_name_plural = "Configs"
+        app_label = "config_database"
+
 
 
 class GptModels(models.Model):
@@ -142,3 +170,4 @@ class GptModels(models.Model):
         verbose_name = "Gpt Model"
         verbose_name_plural = "Gpt Models"
         db_table = "gpt_models"
+

@@ -43,6 +43,8 @@ class TelegramBot(models.Model):
         db_table = "telegram_bot"
 
 
+
+
 class TelegramProfile(models.Model):
     bot = models.ManyToManyField(TelegramBot)
     telegram_id = models.PositiveBigIntegerField(unique=True)
@@ -60,3 +62,4 @@ class TelegramProfile(models.Model):
         verbose_name = "Telegram Profile"
         verbose_name_plural = "Telegram Profiles"
         db_table = "telegram_profile"
+        app_label="user_data"
