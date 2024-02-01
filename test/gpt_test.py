@@ -4,7 +4,7 @@ import concurrent
 import openai
 from asgiref.sync import sync_to_async
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 

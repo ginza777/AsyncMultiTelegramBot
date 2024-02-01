@@ -2,15 +2,14 @@ from asgiref.sync import sync_to_async
 from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 from telegram import Update
-from django.utils.translation import gettext_lazy as _
-
 from apps.chatgpt_bot.buttons.inline_keyboard import get_chat_modes_keyboard, main_setting_keyboard, \
     ai_model_setting_keyboard, language_list_keyboard
-from apps.chatgpt_bot.function.functions import HELP_MESSAGE, START_MESSAGE, IMPORTANT_MESSAGE
+from apps.chatgpt_bot.function.functions import HELP_MESSAGE, START_MESSAGE, IMPORTANT_MESSAGE, \
+    get_current_model, get_user_token, get_current_chat_mode
 from apps.chatgpt_bot.function.user_get_or_create import chat_gpt_user
 from utils.decarators import get_member
-from apps.chatgpt_bot.models import Chat_mode
-
+from apps.chatgpt_bot.models import Chat_mode, ChatGptUser
+from apps.chatgpt_bot.openai_integrations.openai import send_message_stream
 
 @get_member
 @chat_gpt_user
@@ -113,3 +112,18 @@ async def settings_choice_handle(update: Update, context: CallbackContext, chat_
         )
     else:
         pass
+
+
+@get_member
+@chat_gpt_user
+async def message_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
+    text = update.message.text
+    model_name = await get_current_model(chat_gpt_user)
+    chat_token = await get_user_token(chat_gpt_user)
+    promt = await get_current_chat_mode(chat_gpt_user)
+
+    res, token = await send_message_stream(text, model_name, chat_token, promt)
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=res
+    )

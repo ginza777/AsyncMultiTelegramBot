@@ -1,8 +1,10 @@
 import os
 from django.conf import settings
 from telegram import Bot, BotCommand
-from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder, CallbackQueryHandler
-from apps.chatgpt_bot.bot_functions import start, help,show_chat_modes,show_chat_modes_callback_handle,set_chat_modes_callback_handle,settings_handle,settings_choice_handle
+from telegram.ext import Application, PicklePersistence, CommandHandler, ApplicationBuilder, CallbackQueryHandler, \
+    MessageHandler,filters
+from apps.chatgpt_bot.bot_functions import start, help,show_chat_modes,show_chat_modes_callback_handle,\
+    set_chat_modes_callback_handle,settings_handle,settings_choice_handle,message_handle
 
 
 async def post_init(application: Application):
@@ -44,8 +46,8 @@ async def setup(token):
     #settings
     application.add_handler(CallbackQueryHandler(settings_choice_handle, pattern="^main_setting_"))
     application.add_handler(CommandHandler("settings", settings_handle))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
 
-    # application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
 
     # application.add_handler(CommandHandler("help_group_chat", help_group_chat_handle))
     #

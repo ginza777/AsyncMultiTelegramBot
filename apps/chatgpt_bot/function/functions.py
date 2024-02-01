@@ -1,7 +1,5 @@
-from channels.db import database_sync_to_async
-from apps.chatgpt_bot.models import ChatGptUser, Chat_mode, GptModels
 from django.utils.translation import gettext_lazy as _
-
+from asgiref.sync import sync_to_async
 
 HELP_MESSAGE = str(_("""Commands:
 ⚪️ /retry – Regenerate last bot answer
@@ -29,44 +27,16 @@ def split_text_into_chunks(text, chunk_size):
     return [text[i: i + chunk_size] for i in range(0, len(text), chunk_size)]
 
 
-@database_sync_to_async
-def check_user_exists(tg_user) -> bool:
-    return ChatGptUser.objects.filter(user=tg_user).exists()
+@sync_to_async
+def get_current_model(chat_gpt_user):
+    return chat_gpt_user.current_model.model
 
 
-@database_sync_to_async
-def create_user(tg_user) -> object:
-    return ChatGptUser.objects.create(user=tg_user, chat_id=tg_user.telegram_id).save()
+@sync_to_async
+def get_user_token(chat_gpt_user):
+    return chat_gpt_user.user_token
 
 
-@database_sync_to_async
-def get_user(tg_user) -> object:
-    return ChatGptUser.objects.get(user=tg_user)
-
-
-@database_sync_to_async
-def get_user_by_id(telegram_id: int) -> object:
-    return ChatGptUser.objects.get(user__telegram_id=telegram_id)
-
-
-async def save_user_async(user):
-    await database_sync_to_async(user.save)()
-
-
-@database_sync_to_async
-def get_chat_mode_name(user_id):
-    user = ChatGptUser.objects.get(user__telegram_id=user_id)
-    model = user.current_chat_mode
-    chat_mode_instance = Chat_mode.objects.get(key=model)
-    return chat_mode_instance.model_name
-
-@database_sync_to_async
-def models():
-    return GptModels.objects.all()
-
-
-@database_sync_to_async
-def get_chat_mode(chat_mode):
-    msg=Chat_mode.objects.get(key=chat_mode)
-    print(msg)
-    return msg.welcome_message
+@sync_to_async
+def get_current_chat_mode(chat_gpt_user):
+    return chat_gpt_user.current_chat_mode.prompt_start

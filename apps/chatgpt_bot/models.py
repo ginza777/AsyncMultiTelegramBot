@@ -11,6 +11,39 @@ AVAILABLE_TEXT_MODELS_CHOICES = [
 ]
 
 
+class Chat_mode(models.Model):
+    key = models.CharField(max_length=200)
+    model_name = models.CharField(max_length=200)
+    model_type = models.CharField(max_length=200, null=True, blank=True)
+    welcome_message = models.TextField()
+    prompt_start = models.TextField(null=True, blank=True)
+    parse_mode = models.CharField(max_length=200, null=True, blank=True, default="html")
+    extra_field = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.model_name
+
+    class Meta:
+        verbose_name = "Chat Mode"
+        verbose_name_plural = "Chat Modes"
+        db_table = "chat_mode"
+
+
+class GptModels(models.Model):
+    model = models.CharField(max_length=200, unique=True)
+    config = models.JSONField()
+
+    def __str__(self):
+        return self.model
+
+    class Meta:
+        verbose_name = "Gpt Model"
+        verbose_name_plural = "Gpt Models"
+        db_table = "gpt_models"
+
+
 class TextModel(models.Model):
     name = models.CharField(max_length=200, unique=True)
     key = models.CharField(max_length=200, unique=True)
@@ -64,8 +97,9 @@ class ChatGptUser(models.Model):
     chat_id = models.BigIntegerField(null=True, blank=True)
     last_interaction = models.DateTimeField(auto_now=True)
     first_seen = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    current_chat_mode = models.ForeignKey(TextModel, on_delete=models.SET_NULL, null=True, blank=True,related_name="current_chat_mode")
-    current_model = models.ForeignKey(TextModel, on_delete=models.SET_NULL, null=True, blank=True)
+    current_chat_mode = models.ForeignKey(Chat_mode, on_delete=models.SET_NULL, null=True, blank=True,
+                                          related_name="current_chat_mode")
+    current_model = models.ForeignKey(GptModels, on_delete=models.SET_NULL, null=True, blank=True)
     n_used_tokens = models.PositiveBigIntegerField(null=True, blank=True)
     n_generated_images = models.IntegerField(default=0, null=True, blank=True)
     n_transcribed_seconds = models.IntegerField(default=0, null=True, blank=True)
@@ -76,7 +110,7 @@ class ChatGptUser(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+            self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
         if not self.user_token:
             self.user_token = uuid.uuid4()
@@ -116,26 +150,6 @@ class Messages_dialog(models.Model):
         db_table = "messages_dialog"
 
 
-class Chat_mode(models.Model):
-    key = models.CharField(max_length=200)
-    model_name = models.CharField(max_length=200)
-    model_type = models.CharField(max_length=200, null=True, blank=True)
-    welcome_message = models.TextField()
-    prompt_start = models.TextField(null=True, blank=True)
-    parse_mode = models.CharField(max_length=200, null=True, blank=True, default="html")
-    extra_field = models.JSONField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.model_name
-
-    class Meta:
-        verbose_name = "Chat Mode"
-        verbose_name_plural = "Chat Modes"
-        db_table = "chat_mode"
-
-
 class Config(models.Model):
     openai_api_base = models.CharField(null=True, blank=True, max_length=200)
     new_dialog_timeout = models.IntegerField(null=True, blank=True, default=600)
@@ -156,16 +170,3 @@ class Config(models.Model):
     class Meta:
         verbose_name = "Config"
         verbose_name_plural = "Configs"
-
-
-class GptModels(models.Model):
-    model = models.CharField(max_length=200, unique=True)
-    config = models.JSONField()
-
-    def __str__(self):
-        return self.model
-
-    class Meta:
-        verbose_name = "Gpt Model"
-        verbose_name_plural = "Gpt Models"
-        db_table = "gpt_models"
