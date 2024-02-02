@@ -7,13 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chatgpt_bot', '0002_alter_chatgptuser_current_model'),
+        ("chatgpt_bot", "0002_alter_chatgptuser_current_model"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='chatgptuser',
-            name='current_chat_mode',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='current_chat_mode', to='chatgpt_bot.chat_mode'),
+            model_name="chatgptuser",
+            name="current_chat_mode",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="current_chat_mode",
+                to="chatgpt_bot.chat_mode",
+            ),
         ),
     ]

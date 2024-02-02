@@ -1,12 +1,12 @@
 import uuid
 
+import environ
 import openai
 from asgiref.sync import sync_to_async
 from telegram.constants import ParseMode
 
 from apps.chatgpt_bot.models import Dialog, Messages_dialog
-from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages, _count_tokens_from_prompt
-import environ
+from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
 
 env = environ.Env()
 environ.Env.read_env()
@@ -25,7 +25,7 @@ def create_msg(message, answer, user, input_tokens, output_tokens):
             chat_mode=user.current_chat_mode,
             gpt_model=user.current_model,
             input_tokens=input_tokens,
-            output_tokens=output_tokens
+            output_tokens=output_tokens,
         )
     message = Messages_dialog.objects.create(
         user=message,
@@ -33,7 +33,7 @@ def create_msg(message, answer, user, input_tokens, output_tokens):
         dialog=dialog,
         msg_token=uuid.uuid4().hex,
         input_tokens=input_tokens,
-        output_tokens=output_tokens
+        output_tokens=output_tokens,
     )
 
     return message.msg_token
@@ -85,22 +85,25 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
             presence_penalty=0,
         )
         answer = ""
-        i=1
+        i = 1
         for r_item in r_gen:
             delta = r_item.choices[0].delta
             if "content" in delta:
                 answer += delta.content
-                if len(answer)//50==i:
-                    msg = await context.bot.edit_message_text(chat_id=update.message.chat_id,
-                                                              text=_postprocess_answer(answer),
-                                                              message_id=msg.message_id,
-                                                              parse_mode=ParseMode.MARKDOWN)
-                    i+=1
-        msg = await context.bot.edit_message_text(chat_id=update.message.chat_id,
-                                                  text=_postprocess_answer(answer),
-                                                  message_id=msg.message_id,
-                                                  parse_mode=ParseMode.MARKDOWN)
-
+                if len(answer) // 50 == i:
+                    msg = await context.bot.edit_message_text(
+                        chat_id=update.message.chat_id,
+                        text=_postprocess_answer(answer),
+                        message_id=msg.message_id,
+                        parse_mode=ParseMode.MARKDOWN,
+                    )
+                    i += 1
+        msg = await context.bot.edit_message_text(
+            chat_id=update.message.chat_id,
+            text=_postprocess_answer(answer),
+            message_id=msg.message_id,
+            parse_mode=ParseMode.MARKDOWN,
+        )
 
         model = user.current_model
         input_message = messages

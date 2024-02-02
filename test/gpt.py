@@ -1,5 +1,8 @@
 import openai
+
 openai.api_key = "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"
+
+
 async def send_message_stream(message, model_name):
     async def _postprocess_answer(self, answer):
         answer = answer.strip()
@@ -24,9 +27,9 @@ async def send_message_stream(message, model_name):
                     top_p=1,
                     frequency_penalty=0,
                     presence_penalty=0,
-                    request_timeout=60
+                    request_timeout=60,
                 )
-                print("r-gen:  ",r_gen)
+                print("r-gen:  ", r_gen)
                 answer = ""
             #     async for r_item in r_gen:
             #         delta = r_item.choices[0].delta
@@ -44,16 +47,18 @@ async def send_message_stream(message, model_name):
     yield "finished", answer
     # n_input_tokens, n_output_tokens), n_first_dialog_messages_removed  # sending final answer
 
+
 # Example usage:
 
 
-
 import asyncio
+
 
 async def main():
     async for status, response in send_message_stream("salom", "gpt-3.5-turbo"):
         if status == "finished":
             print("Final response:", response)
+
 
 # Run the event loop
 asyncio.run(main())

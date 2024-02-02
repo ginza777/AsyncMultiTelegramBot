@@ -1,7 +1,9 @@
 import json
+
 from asgiref.sync import sync_to_async
 from django.http import JsonResponse
 from telegram import Update
+
 from apps.bot_main_setup.models import TelegramBot
 from apps.chatgpt_bot.views import setup as setup_chatgpt
 from apps.common.bot import setup as setup_common
@@ -44,7 +46,7 @@ async def handle_telegram_webhook(request, bot_token):
     try:
         application, bot = await setup(bot_token)
         body = request.body
-        data = json.loads(body.decode('utf-8'))
+        data = json.loads(body.decode("utf-8"))
         update = Update.de_json(data, bot)
         print(data)
         await application.process_update(update)

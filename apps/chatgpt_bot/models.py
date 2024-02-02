@@ -1,6 +1,8 @@
-from django.db import models
 import uuid
-from apps.bot_main_setup.models import TelegramProfile, TelegramBot
+
+from django.db import models
+
+from apps.bot_main_setup.models import TelegramBot, TelegramProfile
 
 AVAILABLE_TEXT_MODELS_CHOICES = [
     ("gpt-3.5-turbo", "GPT-3.5 Turbo"),
@@ -100,14 +102,16 @@ class ChatGptUser(models.Model):
         GERMAN = "de", "German"
 
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(TelegramProfile, on_delete=models.SET_NULL, verbose_name="Telegram User", null=True,
-                             blank=True)
+    user = models.ForeignKey(
+        TelegramProfile, on_delete=models.SET_NULL, verbose_name="Telegram User", null=True, blank=True
+    )
     chat_id = models.BigIntegerField(null=True, blank=True)
     last_interaction = models.DateTimeField(auto_now=True)
     first_seen = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    current_chat_mode = models.ForeignKey(Chat_mode, on_delete=models.SET_NULL, null=True, blank=True,
-                                          related_name="current_chat_mode",default=1)
-    current_model = models.ForeignKey(GptModels, on_delete=models.SET_NULL, null=True, blank=True,default=1)
+    current_chat_mode = models.ForeignKey(
+        Chat_mode, on_delete=models.SET_NULL, null=True, blank=True, related_name="current_chat_mode", default=1
+    )
+    current_model = models.ForeignKey(GptModels, on_delete=models.SET_NULL, null=True, blank=True, default=1)
     n_used_tokens = models.PositiveBigIntegerField(null=True, blank=True)
     n_generated_images = models.IntegerField(default=0, null=True, blank=True)
     n_transcribed_seconds = models.IntegerField(default=0, null=True, blank=True)
@@ -118,9 +122,7 @@ class ChatGptUser(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     language_choice = models.CharField(max_length=255, choices=Language.choices, default=Language.UZBEK, null=True)
 
-    def save(
-            self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.user_token:
             self.user_token = uuid.uuid4()
         super(ChatGptUser, self).save(force_insert, force_update, using, update_fields)
@@ -162,9 +164,7 @@ class Messages_dialog(models.Model):
     input_tokens = models.IntegerField(default=0)
     output_tokens = models.IntegerField(default=0)
 
-    def save(
-            self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.msg_token:
             self.user_token = uuid.uuid4()
         super(Messages_dialog, self).save(force_insert, force_update, using, update_fields)

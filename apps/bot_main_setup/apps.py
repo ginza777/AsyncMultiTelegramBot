@@ -1,15 +1,15 @@
 import asyncio
+
+import django.core.exceptions
+import environ
 import requests.exceptions
+import telegram
 from asgiref.sync import sync_to_async
 from django.apps import AppConfig
-import telegram
-import django.core.exceptions
-from django.core.management import call_command
-
-from utils.bot import set_webhook
-import environ
 from django.db.utils import ProgrammingError
+
 from apps.bot_main_setup.function.createsuperuser import create_superuser
+from utils.bot import set_webhook
 
 env = environ.Env()
 environ.Env.read_env()
@@ -17,8 +17,8 @@ import traceback
 
 
 class BotConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.bot_main_setup'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.bot_main_setup"
 
     def ready(self):
         # call_command('migrate', interactive=False)
@@ -46,6 +46,7 @@ class BotConfig(AppConfig):
     def get_bot_tokens(self):
         try:
             from apps.bot_main_setup.models import TelegramBot
+
             bot_tokens = list(TelegramBot.objects.all().values_list("bot_token", flat=True))
         except ProgrammingError:
             bot_tokens = []

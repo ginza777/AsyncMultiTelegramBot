@@ -1,6 +1,6 @@
+import requests
 from django.conf import settings
 from telegram.ext import Application
-import requests
 
 
 async def set_webhook(bot_token):
@@ -14,7 +14,9 @@ async def set_webhook(bot_token):
 
 def set_webhook_sync(bot_token):
     webhook_url = settings.WEBHOOK_URL
-    url = f"https://api.telegram.org/bot{bot_token}/setWebhook?url={webhook_url}/bot/handle_telegram_webhook/{bot_token}"
+    url = (
+        f"https://api.telegram.org/bot{bot_token}/setWebhook?url={webhook_url}/bot/handle_telegram_webhook/{bot_token}"
+    )
     response = requests.post(url)
     print(response.json())
     return response.json()

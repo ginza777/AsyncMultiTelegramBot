@@ -7,44 +7,58 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='TelegramBot',
+            name="TelegramBot",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=30, null=True)),
-                ('bot_token', models.CharField(max_length=255, unique=True)),
-                ('bot_username', models.CharField(blank=True, max_length=125, null=True)),
-                ('app_name', models.CharField(max_length=255)),
-                ('extra_field', models.JSONField(blank=True, null=True)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(blank=True, max_length=30, null=True)),
+                ("bot_token", models.CharField(max_length=255, unique=True)),
+                ("bot_username", models.CharField(blank=True, max_length=125, null=True)),
+                ("app_name", models.CharField(max_length=255)),
+                ("extra_field", models.JSONField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'Telegram Bot',
-                'verbose_name_plural': 'Telegram Bots',
-                'db_table': 'telegram_bot',
-                'unique_together': {('bot_token', 'app_name')},
+                "verbose_name": "Telegram Bot",
+                "verbose_name_plural": "Telegram Bots",
+                "db_table": "telegram_bot",
+                "unique_together": {("bot_token", "app_name")},
             },
         ),
         migrations.CreateModel(
-            name='TelegramProfile',
+            name="TelegramProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('telegram_id', models.PositiveBigIntegerField(unique=True)),
-                ('first_name', models.CharField(max_length=255, null=True)),
-                ('last_name', models.CharField(blank=True, max_length=255, null=True)),
-                ('username', models.CharField(blank=True, max_length=255, null=True)),
-                ('language', models.CharField(choices=[('uz', 'Uzbek'), ('en', 'English'), ('ru', 'Russian'), ('es', 'Spanish'), ('fr', 'French'), ('de', 'German')], default='uz', max_length=255, null=True)),
-                ('is_bot', models.BooleanField(default=False)),
-                ('extra_field', models.JSONField(blank=True, null=True)),
-                ('bot', models.ManyToManyField(to='bot_main_setup.telegrambot')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("telegram_id", models.PositiveBigIntegerField(unique=True)),
+                ("first_name", models.CharField(max_length=255, null=True)),
+                ("last_name", models.CharField(blank=True, max_length=255, null=True)),
+                ("username", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[
+                            ("uz", "Uzbek"),
+                            ("en", "English"),
+                            ("ru", "Russian"),
+                            ("es", "Spanish"),
+                            ("fr", "French"),
+                            ("de", "German"),
+                        ],
+                        default="uz",
+                        max_length=255,
+                        null=True,
+                    ),
+                ),
+                ("is_bot", models.BooleanField(default=False)),
+                ("extra_field", models.JSONField(blank=True, null=True)),
+                ("bot", models.ManyToManyField(to="bot_main_setup.telegrambot")),
             ],
             options={
-                'verbose_name': 'Telegram Profile',
-                'verbose_name_plural': 'Telegram Profiles',
-                'db_table': 'telegram_profile',
+                "verbose_name": "Telegram Profile",
+                "verbose_name_plural": "Telegram Profiles",
+                "db_table": "telegram_profile",
             },
         ),
     ]

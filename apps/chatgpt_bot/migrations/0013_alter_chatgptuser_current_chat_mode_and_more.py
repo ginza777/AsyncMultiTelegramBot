@@ -7,18 +7,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chatgpt_bot', '0012_messages_dialog_input_tokens_and_more'),
+        ("chatgpt_bot", "0012_messages_dialog_input_tokens_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='chatgptuser',
-            name='current_chat_mode',
-            field=models.ForeignKey(blank=True, default=1, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='current_chat_mode', to='chatgpt_bot.chat_mode'),
+            model_name="chatgptuser",
+            name="current_chat_mode",
+            field=models.ForeignKey(
+                blank=True,
+                default=1,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="current_chat_mode",
+                to="chatgpt_bot.chat_mode",
+            ),
         ),
         migrations.AlterField(
-            model_name='chatgptuser',
-            name='current_model',
-            field=models.ForeignKey(blank=True, default=1, null=True, on_delete=django.db.models.deletion.SET_NULL, to='chatgpt_bot.gptmodels'),
+            model_name="chatgptuser",
+            name="current_model",
+            field=models.ForeignKey(
+                blank=True,
+                default=1,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="chatgpt_bot.gptmodels",
+            ),
         ),
     ]

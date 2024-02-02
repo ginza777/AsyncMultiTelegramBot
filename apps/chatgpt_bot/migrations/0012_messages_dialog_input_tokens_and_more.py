@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chatgpt_bot', '0011_alter_dialog_chat_mode'),
+        ("chatgpt_bot", "0011_alter_dialog_chat_mode"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='messages_dialog',
-            name='input_tokens',
+            model_name="messages_dialog",
+            name="input_tokens",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='messages_dialog',
-            name='output_tokens',
+            model_name="messages_dialog",
+            name="output_tokens",
             field=models.IntegerField(default=0),
         ),
     ]

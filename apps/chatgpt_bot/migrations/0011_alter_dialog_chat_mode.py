@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chatgpt_bot', '0010_alter_dialog_chat_mode'),
+        ("chatgpt_bot", "0010_alter_dialog_chat_mode"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='dialog',
-            name='chat_mode',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='chatgpt_bot.chat_mode'),
+            model_name="dialog",
+            name="chat_mode",
+            field=models.ForeignKey(
+                blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to="chatgpt_bot.chat_mode"
+            ),
         ),
     ]

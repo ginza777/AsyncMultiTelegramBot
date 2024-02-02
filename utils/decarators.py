@@ -1,5 +1,6 @@
 from channels.db import database_sync_to_async
 from django.utils.translation import activate
+
 from apps.bot_main_setup import models
 
 
@@ -10,7 +11,6 @@ def get_member(func):
         except AttributeError:
             user_id = update.callback_query.message.chat_id
         bot = await models.TelegramBot.objects.aget(bot_username=context.bot.username)
-
 
         language_code = update.effective_user.language_code
         try:
@@ -24,12 +24,11 @@ def get_member(func):
         user, created = await models.TelegramProfile.objects.aget_or_create(
             telegram_id=user_id,
             defaults={
-                'first_name': update.effective_user.first_name,
-                'last_name': update.effective_user.last_name,
-                'username': update.effective_user.username,
-                'language':selected_language,
-
-            }
+                "first_name": update.effective_user.first_name,
+                "last_name": update.effective_user.last_name,
+                "username": update.effective_user.username,
+                "language": selected_language,
+            },
         )
         if not created:
             user.first_name = update.effective_user.first_name
@@ -42,7 +41,7 @@ def get_member(func):
             user.language = selected_language
             await database_sync_to_async(user.bot.add)(bot)
             await user.asave()
-        activate('en')
+        activate("en")
         return await func(update, context, user, *args, **kwargs)
 
     return wrap

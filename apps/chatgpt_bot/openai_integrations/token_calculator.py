@@ -29,4 +29,3 @@ def num_tokens_from_messages(messages, model):
                 num_tokens += -1  # role is always required and always 1 token
 
     return num_tokens
-

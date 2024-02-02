@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chatgpt_bot', '0006_messages_dialog_msg_token_and_more'),
+        ("chatgpt_bot", "0006_messages_dialog_msg_token_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='dialog',
-            name='end',
+            model_name="dialog",
+            name="end",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -1,5 +1,6 @@
 from django.db import models
-from utils.bot import set_webhook_sync, get_info
+
+from utils.bot import get_info, set_webhook_sync
 
 
 class Language(models.TextChoices):
@@ -43,8 +44,6 @@ class TelegramBot(models.Model):
         db_table = "telegram_bot"
 
 
-
-
 class TelegramProfile(models.Model):
     bot = models.ManyToManyField(TelegramBot)
     telegram_id = models.PositiveBigIntegerField(unique=True)
@@ -62,5 +61,3 @@ class TelegramProfile(models.Model):
         verbose_name = "Telegram Profile"
         verbose_name_plural = "Telegram Profiles"
         db_table = "telegram_profile"
-
-

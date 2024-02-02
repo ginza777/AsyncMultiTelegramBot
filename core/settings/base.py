@@ -111,7 +111,7 @@ DATABASES = {
         "USER": env.str("DB_USER"),
         "PASSWORD": env.get_value("DB_PASSWORD"),
         "HOST": env.str("DB_HOST"),
-        "PORT": env.str("DB_PORT")
+        "PORT": env.str("DB_PORT"),
     }
 }
 
@@ -196,4 +196,3 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 # Bot settings
 WEBHOOK_URL = env.str("WEBHOOK_URL")
-

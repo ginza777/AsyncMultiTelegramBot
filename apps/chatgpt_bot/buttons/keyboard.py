@@ -1,7 +1,8 @@
-from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram import KeyboardButton, ReplyKeyboardMarkup
+
 
 def generate_keyboard(items):
-    keyboard=[]
+    keyboard = []
     row = []
     count = 0
 
