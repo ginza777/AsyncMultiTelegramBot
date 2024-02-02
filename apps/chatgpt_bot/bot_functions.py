@@ -4,21 +4,26 @@ from telegram.ext import CallbackContext
 from telegram import Update
 from apps.chatgpt_bot.buttons.inline_keyboard import get_chat_modes_keyboard, main_setting_keyboard, \
     ai_model_setting_keyboard, language_list_keyboard, back_settings
+from apps.chatgpt_bot.buttons.keyboard import generate_keyboard
 from apps.chatgpt_bot.function.functions import HELP_MESSAGE, START_MESSAGE, IMPORTANT_MESSAGE, \
-    get_current_model, get_user_token, get_current_chat_mode, save_custom_language, new_diaolog
+    get_current_model, get_user_token, get_current_chat_mode, save_custom_language, new_diaolog, new_diaolog_sync
 from apps.chatgpt_bot.function.user_get_or_create import chat_gpt_user
 from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
 from utils.decarators import get_member
-from apps.chatgpt_bot.models import Chat_mode, ChatGptUser
+from apps.chatgpt_bot.models import Chat_mode, ChatGptUser, GptModels
 from apps.chatgpt_bot.openai_integrations.openai import send_message_stream
 
 
 @get_member
 @chat_gpt_user
 async def start(update: Update, context: CallbackContext, chat_gpt_user, *args, **kwargs):
+    buttons = ["My_account", "New_dialog", "Retry", "Chat_mode", "Settings", "Help", "About_us", "Contact_us"]
+    my_list = buttons
+    reply_markup = generate_keyboard(my_list)
+
     await context.bot.send_message(chat_id=update.effective_chat.id, text=START_MESSAGE, parse_mode="HTML")
     await context.bot.send_message(chat_id=update.effective_chat.id, text=HELP_MESSAGE + IMPORTANT_MESSAGE,
-                                   parse_mode="HTML")
+                                   parse_mode="HTML", reply_markup=reply_markup)
 
 
 @get_member
@@ -56,15 +61,24 @@ async def show_chat_modes_callback_handle(update: Update, context: CallbackConte
     )
 
 
+@sync_to_async
+def set_chat_modes(chat_gpt_user, id):
+    new_diaolog_sync(chat_gpt_user)
+    chat_mode = Chat_mode.objects.get(id=id)
+    chat_gpt_user.current_chat_mode = chat_mode
+    if chat_gpt_user.current_model is None or chat_gpt_user.current_model == "null":
+        chat_gpt_user.current_model = GptModels.objects.get(model="gpt-3.5-turbo-0125")
+    chat_gpt_user.save()
+
+
 @get_member
 @chat_gpt_user
-async def set_chat_modes_callback_handle(update: Update, context: CallbackContext, chat_gpt_user, *args, **kwargs):
+async def set_chat_modes_callback_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args,
+                                         **kwargs):
     query = update.callback_query
-    id = query.data.split("set_chat_modes_")[-1]
-    chat_mode = await sync_to_async(Chat_mode.objects.get)(id=id)
-    chat_gpt_user.chat_mode = chat_mode
-    await chat_gpt_user.asave()
-
+    print(100 * "*")
+    chat_mode = await sync_to_async(Chat_mode.objects.get)(id=query.data.split("set_chat_modes_")[-1])
+    await set_chat_modes(chat_gpt_user, query.data.split("set_chat_modes_")[-1])
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text=f"{chat_mode.welcome_message}", parse_mode=ParseMode.HTML
@@ -141,11 +155,8 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     text = update.message.text
     model_name = await get_current_model(chat_gpt_user)
     chat_token = await get_user_token(chat_gpt_user)
-    promt = await get_current_chat_mode(chat_gpt_user)
 
-
-
-    await send_message_stream(text, model_name, chat_token, chat_gpt_user,update,context)
+    await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context)
 
 
 @get_member
@@ -173,10 +184,10 @@ async def language_choice_handle(update: Update, context: CallbackContext, chat_
 @get_member
 @chat_gpt_user
 async def new_dialog_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
-    status=await new_diaolog(chat_gpt_user)
+    status = await new_diaolog(chat_gpt_user)
     if status:
-        message="You created new dialogue!"
+        message = "You created new dialogue!"
     else:
-        message="You have not dialogue yet!"
+        message = "You have not dialogue yet!"
 
     await update.message.reply_text(message)

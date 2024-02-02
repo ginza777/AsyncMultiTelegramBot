@@ -63,4 +63,14 @@ def new_diaolog(user):
 
 
 
+def new_diaolog_sync(user):
+    if Dialog.objects.filter(user=user,end=False).exists():
+        Dialog.objects.filter(user=user, end=False).update(end=True)
+        return True
+    else:
+        return False
+
+
+
+
 

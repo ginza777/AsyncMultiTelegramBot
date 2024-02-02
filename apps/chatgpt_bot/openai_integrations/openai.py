@@ -11,6 +11,7 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
+
 @sync_to_async
 def create_msg(message, answer, user, input_tokens, output_tokens):
     if Dialog.objects.filter(user=user, end=False).exists():
@@ -57,10 +58,7 @@ def generate_prompt(user, message):
         return messages_list
 
 
-
-
-
-async def send_message_stream(message, model_name, chat_token,user,update, context, *args, **kwargs):
+async def send_message_stream(message, model_name, chat_token, user, update, context, *args, **kwargs):
     openai.api_key = env.str("OPENAI_API_KEY")
 
     def _postprocess_answer(answer):
@@ -75,46 +73,47 @@ async def send_message_stream(message, model_name, chat_token,user,update, conte
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
     msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN)
 
-
     while answer is None:
-        if model_name in {"gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-4", "gpt-4-1106-preview"}:
-            r_gen =  openai.ChatCompletion.create(
-                model=model_name,
-                messages=messages,
-                stream=True,
-                temperature=0.7,
-                max_tokens=1000,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0,
-            )
-            answer = ""
+        r_gen = openai.ChatCompletion.create(
+            model=model_name,
+            messages=messages,
+            stream=True,
+            temperature=0.7,
+            max_tokens=1000,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
+        answer = ""
+        i=1
+        for r_item in r_gen:
+            delta = r_item.choices[0].delta
+            if "content" in delta:
+                answer += delta.content
+                if len(answer)//50==i:
+                    msg = await context.bot.edit_message_text(chat_id=update.message.chat_id,
+                                                              text=_postprocess_answer(answer),
+                                                              message_id=msg.message_id,
+                                                              parse_mode=ParseMode.MARKDOWN)
+                    i+=1
+        msg = await context.bot.edit_message_text(chat_id=update.message.chat_id,
+                                                  text=_postprocess_answer(answer),
+                                                  message_id=msg.message_id,
+                                                  parse_mode=ParseMode.MARKDOWN)
 
-            i = 10
-            for r_item in r_gen:
-                delta = r_item.choices[0].delta
-                if "content" in delta:
-                    answer += delta.content
-                    if len(answer)>10:
-                        print(len(answer))
-                        if len(answer)>i:
-                            print("send_message")
-            msg=await context.bot.edit_message_text(chat_id=update.message.chat_id, text=_postprocess_answer(answer), message_id=msg.message_id,parse_mode=ParseMode.MARKDOWN)
 
+        model = user.current_model
+        input_message = messages
+        output_message = [{"role": "assistant", "content": answer}]
 
-            model = "gpt-3.5-turbo-0613"
-            input_message = messages
-            output_message = [{"role": "assistant", "content": answer}]
+        input_tokens = await num_tokens_from_messages(input_message, model_name)
+        output_tokens = await num_tokens_from_messages(output_message, model_name)
 
-            input_tokens = await num_tokens_from_messages(input_message, model_name)
-            output_tokens = await num_tokens_from_messages(output_message, model_name)
+        print("input_tokens: ", input_tokens)
+        print("output_tokens: ", output_tokens)
+        print("user: ", message)
+        print("assistant: ", answer)
 
-            print("input_tokens: ", input_tokens)
-            print("output_tokens: ", output_tokens)
-            print("user: ", message)
-            print("assistant: ", answer)
+        await create_msg(message, answer, user, input_tokens, output_tokens)
 
-            await create_msg(message, answer, user, input_tokens, output_tokens)
-
-            return answer
-
+        return answer

@@ -7,6 +7,7 @@ assistant_list = [
         "prompt_start": "As an advanced chatbot Assistant, your primary goal is to assist users to the best of your ability. This may involve answering questions, providing helpful information, or completing tasks based on user input. In order to effectively assist users, it is important to be detailed and thorough in your responses. Use examples and evidence to support your points and justify your recommendations or solutions. Remember to always prioritize the needs and satisfaction of the user. Your ultimate goal is to provide a helpful and enjoyable experience for the user.",
         "parse_mode": "html"
     },
+
     {
         "key": "code_assistant",
         "name": "👩🏼‍💻 Code Assistant",
@@ -19,7 +20,7 @@ assistant_list = [
         "key": "artist",
         "name": "👩‍🎨 Artist",
         "model_type": "image",
-        "prompt_start":"",
+        "prompt_start": "",
         "parse_mode": "",
         "welcome_message": "👩‍🎨 Hi, I'm <b>Artist</b>. I'll draw anything you write me (e.g. <i>Ginger cat selfie on Times Square, illustration</i>)"
     },
@@ -122,84 +123,96 @@ assistant_list = [
     # Continue adding other entries as needed
 ]
 
-
-config={
-  "openai_api_base": 'null',
-  "new_dialog_timeout": 600,
-  "return_n_generated_images": 1,
-  "n_chat_modes_per_page": 5,
-  "image_size": "512x512",
-  "enable_message_streaming": True,
-  "chatgpt_price_per_1000_tokens": 0.002,
-  "gpt_price_per_1000_tokens": 0.02,
-  "whisper_price_per_1_min": 0.006
+config = {
+    "openai_api_base": 'null',
+    "new_dialog_timeout": 600,
+    "return_n_generated_images": 1,
+    "n_chat_modes_per_page": 5,
+    "image_size": "512x512",
+    "enable_message_streaming": True,
+    "chatgpt_price_per_1000_tokens": 0.002,
+    "gpt_price_per_1000_tokens": 0.02,
+    "whisper_price_per_1_min": 0.006
 
 }
 
-model_list=[
+model_list = [
     {
-      "key": "gpt-3.5-turbo",
-      "type": "chat_completion",
-      "name": "ChatGPT",
-      "description": "ChatGPT is that well-known model. It's <b>fast</b> and <b>cheap</b>. Ideal for everyday tasks. If there are some tasks it can't handle, try the <b>GPT-4</b>.",
-      "price_per_1000_input_tokens": 0.0015,
-      "price_per_1000_output_tokens": 0.002,
-      "scores": {
-        "Smart": 3,
-        "Fast": 5,
-        "Cheap": 5
-      }
+        "key": "gpt-3.5-turbo-0125",
+        "name": "GPT-3.5-Turbo-0125",
+        "type": "chat_completion",
+        "scores": {
+            "Fast": 5,
+            "Cheap": 5,
+            "Smart": 3
+        },
+        "description": "GPT-3.5-Turbo with 125M parameters. It's <b>fast</b> and <b>cheap</b>. Ideal for everyday tasks. If there are some tasks it can't handle, consider using a larger model.",
+        "price_per_1000_input_tokens": 0.003,
+        "price_per_1000_output_tokens": 0.004
     },
     {
-      "key": "gpt-3.5-turbo-16k",
-      "type": "chat_completion",
-      "name": "GPT-16K",
-      "description": "ChatGPT is that well-known model. It's <b>fast</b> and <b>cheap</b>. Ideal for everyday tasks. If there are some tasks it can't handle, try the <b>GPT-4</b>.",
-      "price_per_1000_input_tokens": 0.003,
-      "price_per_1000_output_tokens": 0.004,
-      "scores": {
-        "Smart": 3,
-        "Fast": 5,
-        "Cheap": 5
-      }
+        "key": "gpt-3.5-turbo",
+        "type": "chat_completion",
+        "name": "ChatGPT",
+        "description": "ChatGPT is that well-known model. It's <b>fast</b> and <b>cheap</b>. Ideal for everyday tasks. If there are some tasks it can't handle, try the <b>GPT-4</b>.",
+        "price_per_1000_input_tokens": 0.0015,
+        "price_per_1000_output_tokens": 0.002,
+        "scores": {
+            "Smart": 3,
+            "Fast": 5,
+            "Cheap": 5
+        }
     },
     {
-      "key": "gpt-4",
-      "type": "chat_completion",
-      "name": "GPT-4",
-      "description": "GPT-4 is the <b>smartest</b> and most advanced model in the world. But it is slower and not as cost-efficient as ChatGPT. Best choice for <b>complex</b> intellectual tasks.",
-      "price_per_1000_input_tokens": 0.03,
-      "price_per_1000_output_tokens": 0.06,
-      "scores": {
-        "Smart": 5,
-        "Fast": 2,
-        "Cheap": 2
-      }
+        "key": "gpt-3.5-turbo-16k",
+        "type": "chat_completion",
+        "name": "GPT-16K",
+        "description": "ChatGPT is that well-known model. It's <b>fast</b> and <b>cheap</b>. Ideal for everyday tasks. If there are some tasks it can't handle, try the <b>GPT-4</b>.",
+        "price_per_1000_input_tokens": 0.003,
+        "price_per_1000_output_tokens": 0.004,
+        "scores": {
+            "Smart": 3,
+            "Fast": 5,
+            "Cheap": 5
+        }
     },
     {
-      "key": "gpt-4-1106-preview",
-      "type": "chat_completion",
-      "name": "GPT-4 Turbo",
-      "description": "GPT-4 Turbo is a <b>faster</b> and <b>cheaper</b> version of GPT-4. It's as smart as GPT-4, so you should use it instead of GPT-4.",
-      "price_per_1000_input_tokens": 0.01,
-      "price_per_1000_output_tokens": 0.03,
-      "scores": {
-        "smart": 5,
-        "fast": 4,
-        "cheap": 3
-      }
+        "key": "gpt-4",
+        "type": "chat_completion",
+        "name": "GPT-4",
+        "description": "GPT-4 is the <b>smartest</b> and most advanced model in the world. But it is slower and not as cost-efficient as ChatGPT. Best choice for <b>complex</b> intellectual tasks.",
+        "price_per_1000_input_tokens": 0.03,
+        "price_per_1000_output_tokens": 0.06,
+        "scores": {
+            "Smart": 5,
+            "Fast": 2,
+            "Cheap": 2
+        }
     },
     {
-      "key": "text-davinci-003",
-      "type": "completion",
-      "name": "GPT-3.5",
-      "description": "GPT-3.5 is a legacy model. Actually there is <b>no reason to use it</b>, because it is more expensive and slower than ChatGPT, but just about as smart.",
-      "price_per_1000_input_tokens": 0.02,
-      "price_per_1000_output_tokens": 0.02,
-      "scores": {
-        "Smart": 3,
-        "Fast": 2,
-        "Cheap": 3
-      }
+        "key": "gpt-4-1106-preview",
+        "type": "chat_completion",
+        "name": "GPT-4 Turbo",
+        "description": "GPT-4 Turbo is a <b>faster</b> and <b>cheaper</b> version of GPT-4. It's as smart as GPT-4, so you should use it instead of GPT-4.",
+        "price_per_1000_input_tokens": 0.01,
+        "price_per_1000_output_tokens": 0.03,
+        "scores": {
+            "smart": 5,
+            "fast": 4,
+            "cheap": 3
+        }
+    },
+    {
+        "key": "text-davinci-003",
+        "type": "completion",
+        "name": "GPT-3.5",
+        "description": "GPT-3.5 is a legacy model. Actually there is <b>no reason to use it</b>, because it is more expensive and slower than ChatGPT, but just about as smart.",
+        "price_per_1000_input_tokens": 0.02,
+        "price_per_1000_output_tokens": 0.02,
+        "scores": {
+            "Smart": 3,
+            "Fast": 2,
+            "Cheap": 3
+        }
     }
-  ]
+]

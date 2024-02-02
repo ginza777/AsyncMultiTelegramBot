@@ -26,44 +26,35 @@ async def setup(token):
     persistence = PicklePersistence(filepath=persistence_file)
     bot = Bot(token=token)
     await bot.initialize()
-
-    application = (
-        ApplicationBuilder()
-        .token(token)
-        .concurrent_updates(True)
-        .http_version("1.1")
-        .get_updates_http_version("1.1")
-        .post_init(post_init)
-        .persistence(persistence)
-        .build()
-    )
+    application = ApplicationBuilder().token(token).concurrent_updates(True).http_version("1.1").get_updates_http_version("1.1").post_init(post_init).persistence(persistence).build()
 
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.Regex(r'^Start$'), start))
     application.add_handler(CommandHandler("help", help))
+    application.add_handler(MessageHandler(filters.Regex(r'^Help$'), help))
     application.add_handler(CommandHandler("mode", show_chat_modes))
+    application.add_handler(MessageHandler(filters.Regex(r'^Chat_mode$'), show_chat_modes))
+
+    application.add_handler(CommandHandler("settings", settings_handle))
+    application.add_handler(MessageHandler(filters.Regex(r'^Settings$'), settings_handle))
+    application.add_handler(CommandHandler("new", new_dialog_handle))
+    application.add_handler(MessageHandler(filters.Regex(r'^New_dialog$'), new_dialog_handle))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
+
+    #callback
     application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))
     application.add_handler(CallbackQueryHandler(set_chat_modes_callback_handle, pattern="^set_chat_modes"))
-    #settings
     application.add_handler(CallbackQueryHandler(settings_choice_handle, pattern="^main_setting_"))
     application.add_handler(CallbackQueryHandler(language_choice_handle, pattern="^language_setting_"))
     application.add_handler(CallbackQueryHandler(settings_handle, pattern="^setting_back"))
     application.add_handler(CallbackQueryHandler(settings_handle, pattern="^delete_setting_back"))
-    application.add_handler(CommandHandler("settings", settings_handle))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
 
 
     # application.add_handler(CommandHandler("help_group_chat", help_group_chat_handle))
-    #
-    #
     # application.add_handler(CommandHandler("retry", retry_handle))
-    application.add_handler(CommandHandler("new", new_dialog_handle))
     # application.add_handler(CommandHandler("cancel", cancel_handle))
-    #
     # application.add_handler(MessageHandler(filters.VOICE , voice_message_handle))
-
-
     # application.add_handler(CallbackQueryHandler(set_settings_handle, pattern="^set_settings"))
-    #
     # application.add_handler(CommandHandler("balance", show_balance_handle))
     await application.initialize()
     return application, bot
