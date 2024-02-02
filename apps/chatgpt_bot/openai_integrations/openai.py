@@ -2,6 +2,7 @@ import uuid
 
 import openai
 from asgiref.sync import sync_to_async
+from telegram.constants import ParseMode
 
 from apps.chatgpt_bot.models import Dialog, Messages_dialog
 from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages, _count_tokens_from_prompt
@@ -72,7 +73,7 @@ async def send_message_stream(message, model_name, chat_token,user,update, conte
     print("messages: ", messages)
 
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
-    msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....")
+    msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN)
 
 
     while answer is None:
@@ -98,8 +99,8 @@ async def send_message_stream(message, model_name, chat_token,user,update, conte
                         print(len(answer))
                         if len(answer)>i:
                             print("send_message")
-                            msg=await context.bot.edit_message_text(chat_id=update.message.chat_id, text=_postprocess_answer(answer), message_id=msg.message_id)
-                            i=i+50
+            msg=await context.bot.edit_message_text(chat_id=update.message.chat_id, text=_postprocess_answer(answer), message_id=msg.message_id,parse_mode=ParseMode.MARKDOWN)
+
 
             model = "gpt-3.5-turbo-0613"
             input_message = messages
