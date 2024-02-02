@@ -86,17 +86,20 @@ async def send_message_stream(message, model_name, chat_token,user,update, conte
                 top_p=1,
                 frequency_penalty=0,
                 presence_penalty=0,
-                request_timeout=60
             )
             answer = ""
 
-
+            i = 10
             for r_item in r_gen:
                 delta = r_item.choices[0].delta
                 if "content" in delta:
                     answer += delta.content
-                    if len(answer)>3:
-                        msg=await context.bot.edit_message_text(chat_id=update.message.chat_id, text=answer, message_id=msg.message_id)
+                    if len(answer)>10:
+                        print(len(answer))
+                        if len(answer)>i:
+                            print("send_message")
+                            msg=await context.bot.edit_message_text(chat_id=update.message.chat_id, text=_postprocess_answer(answer), message_id=msg.message_id)
+                            i=i+50
 
             model = "gpt-3.5-turbo-0613"
             input_message = messages
