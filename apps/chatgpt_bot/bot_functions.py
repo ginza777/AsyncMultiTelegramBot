@@ -31,7 +31,8 @@ from utils.decarators import get_member
 @get_member
 @chat_gpt_user
 async def start(update: Update, context: CallbackContext, chat_gpt_user, *args, **kwargs):
-    buttons = ["My_account", "New_dialog", "Retry", "Chat_mode", "Settings", "Help", "About_us", "Contact_us"]
+    buttons = ["New_dialog", "Chat_mode", "Help"]
+    #buttons = ["My_account", "New_dialog", "Retry", "Chat_mode", "Settings", "Help", "About_us", "Contact_us"]
     my_list = buttons
     reply_markup = generate_keyboard(my_list)
 
@@ -161,14 +162,41 @@ async def settings_choice_handle(update: Update, context: CallbackContext, chat_
         pass
 
 
+async def is_bot_mentioned(update: Update, context: CallbackContext):
+    try:
+        message = update.message
+
+        if message.chat.type == "private":
+            return True
+
+        if message.text is not None and ("@" + context.bot.username) in message.text:
+            return True
+
+        if message.reply_to_message is not None:
+            if message.reply_to_message.from_user.id == context.bot.id:
+                return True
+    except:
+        return True
+    else:
+        return False
+
+
 @get_member
 @chat_gpt_user
 async def message_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
+
+    if not await is_bot_mentioned(update, context):
+        return
+
+
+
     text = update.message.text
     model_name = await get_current_model(chat_gpt_user)
     chat_token = await get_user_token(chat_gpt_user)
 
     await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context)
+
+
 
 
 @get_member

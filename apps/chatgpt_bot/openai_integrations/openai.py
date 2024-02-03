@@ -40,13 +40,20 @@ def create_msg(message, answer, user, input_tokens, output_tokens):
 
 
 @sync_to_async
-def generate_prompt(user, message):
+def generate_prompt(user, message,bot_name):
+    message=message.replace(f"@{bot_name}","")
+    print("message: ", message)
+
+    message=message.strip()
+
+    print("message: ", message)
+    message="Qisqa va aniq javob ber:"+message
     promt = user.current_chat_mode.prompt_start
     messages_list = [{"role": "system", "content": promt}]
     if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
         # get last 3 messages
-        messages = Messages_dialog.objects.filter(dialog=dialog).order_by("created_at")[:3]
+        messages = Messages_dialog.objects.filter(dialog=dialog).order_by("created_at")[:1]
         if messages.count() > 0:
             for msg in messages:
                 messages_list.append({"role": "user", "content": msg.user})
@@ -67,7 +74,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
 
     answer = None
 
-    messages = await generate_prompt(user, message)
+    messages = await generate_prompt(user, message,context.bot.username)
     print("messages: ", messages)
 
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
@@ -83,6 +90,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
+            timeout=600,
         )
         answer = ""
         i = 1
@@ -90,7 +98,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
             delta = r_item.choices[0].delta
             if "content" in delta:
                 answer += delta.content
-                if len(answer) // 50 == i:
+                if len(answer) // 80 == i:
                     msg = await context.bot.edit_message_text(
                         chat_id=update.message.chat_id,
                         text=_postprocess_answer(answer),

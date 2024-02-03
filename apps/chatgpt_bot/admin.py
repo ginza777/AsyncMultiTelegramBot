@@ -38,11 +38,13 @@ class ChatGptUserAdmin(admin.ModelAdmin):
 @admin.register(Dialog)
 class DialogAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "chat_mode", "start_time", "gpt_model", "bot", "input_tokens", "output_tokens", "end")
+    list_filter = ("chat_mode", "gpt_model", "end","user__user__username")
 
 
 @admin.register(Messages_dialog)
 class MessagesDialogAdmin(admin.ModelAdmin):
     list_display = ("user", "bot", "dialog", "input_tokens", "output_tokens")
+    list_filter = ("dialog__chat_mode", "dialog__gpt_model", "dialog__end","dialog__user__user__username")
 
 
 @admin.register(Chat_mode)
