@@ -4,14 +4,16 @@ from telegram import KeyboardButton, ReplyKeyboardMarkup
 def generate_keyboard(items):
     keyboard = []
     row = []
-    count = 0
 
     for item in items:
-        count += 1
         row.append(KeyboardButton(str(item)))
 
-        if count % 2 == 0:
+        if len(row) == 2:
             keyboard.append(row)
             row = []
+
+    # If there's an odd number of items, add the last one in a new row
+    if row:
+        keyboard.append(row)
 
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
