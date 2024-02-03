@@ -10,6 +10,7 @@ from apps.chatgpt_bot.buttons.inline_keyboard import (
     language_list_keyboard,
     main_setting_keyboard,
 )
+
 from apps.chatgpt_bot.buttons.keyboard import generate_keyboard
 from apps.chatgpt_bot.function.functions import (
     HELP_MESSAGE,
@@ -93,7 +94,7 @@ def set_chat_modes(chat_gpt_user, id):
 @get_member
 @chat_gpt_user
 async def set_chat_modes_callback_handle(
-    update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs
+        update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs
 ):
     query = update.callback_query
     print(100 * "*")
