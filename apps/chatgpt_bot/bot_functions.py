@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 import time
 
@@ -201,17 +202,26 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     print("random_token: ", random_token)
 
     status=await check_msg_token(chat_gpt_user)
-    print("status: ", status)
+    print("\n\n\n\status: ", status)
 
     if not status:
-        msg = await context.bot.send_message(chat_id=update.effective_chat.id, text="You have not dialogue yet!",reply_to_message_id=update.message.message_id)
+        print("You have pending message! can you wait or use command /new ?")
+        msg = await context.bot.send_message(chat_id=update.effective_chat.id, text="You have pending message! can you wait or use command /new ?",reply_to_message_id=update.message.message_id)
         #time sleep
         time.sleep(1)
         await update.message.delete()
         await msg.delete()
     else:
-        await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context,random_token)
-
+        print("Ok ok ok")
+        send_message_stream_task = asyncio.create_task(
+            send_message_stream(
+                text, model_name, chat_token, chat_gpt_user, update, context, random_token
+            )
+        )
+        while not send_message_stream_task.done():
+            print("Waiting for send message task to complete")
+            await asyncio.sleep(3)  # Kutish uchun 1 soniya
+        print("Send message task completed")
 
 
 
