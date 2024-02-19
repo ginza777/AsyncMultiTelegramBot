@@ -184,6 +184,10 @@ async def is_bot_mentioned(update: Update, context: CallbackContext):
     else:
         return False
 
+async def process_user_message(update, context, chat_gpt_user, text, model_name, chat_token, random_token):
+    # Bu funksiya sizning asosiy ishlaringizni bajaradi
+    # send_message_stream va boshqa funksiyalarni chaqiring
+    await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context, random_token)
 
 @get_member
 @chat_gpt_user
@@ -212,6 +216,13 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
         await update.message.delete()
         await msg.delete()
     else:
+        # workers = []
+        # for _ in range(3):
+        #     worker = process_user_message(update, context, chat_gpt_user, text, model_name, chat_token, random_token)
+        #     workers.append(worker)
+        #
+        # # Barcha ishchilarni boshlash
+        # await asyncio.gather(*workers)
         print("Ok ok ok")
         send_message_stream_task = asyncio.create_task(
             send_message_stream(
@@ -220,7 +231,7 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
         )
         while not send_message_stream_task.done():
             print("Waiting for send message task to complete")
-            await asyncio.sleep(3)  # Kutish uchun 1 soniya
+            await asyncio.sleep(5)  # Kutish uchun 1 soniya
         print("Send message task completed")
 
 
