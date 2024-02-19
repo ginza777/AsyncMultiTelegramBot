@@ -155,14 +155,16 @@ class Dialog(models.Model):
 
 
 class Messages_dialog(models.Model):
-    user = models.TextField()
-    bot = models.TextField()
+    user = models.TextField(null=True, blank=True)
+    bot = models.TextField(null=True, blank=True)
     dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE, null=True, blank=True, related_name="messages_dialog")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     msg_token = models.CharField(max_length=255, null=True, blank=True)
     input_tokens = models.IntegerField(default=0)
     output_tokens = models.IntegerField(default=0)
+    end= models.BooleanField(default=False)
+
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.msg_token:

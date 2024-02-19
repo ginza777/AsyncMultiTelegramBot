@@ -1,3 +1,5 @@
+import uuid
+
 from asgiref.sync import sync_to_async
 from telegram import Update
 from telegram.constants import ParseMode
@@ -185,16 +187,19 @@ async def is_bot_mentioned(update: Update, context: CallbackContext):
 @chat_gpt_user
 async def message_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
 
-    if not await is_bot_mentioned(update, context):
-        return
+    if chat_gpt_user.chat_id != 548115215:
+        if not await is_bot_mentioned(update, context):
+            return
 
 
 
     text = update.message.text
     model_name = await get_current_model(chat_gpt_user)
     chat_token = await get_user_token(chat_gpt_user)
+    random_token=uuid.uuid4().hex
+    print("random_token: ", random_token)
 
-    await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context)
+    await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context,random_token)
 
 
 

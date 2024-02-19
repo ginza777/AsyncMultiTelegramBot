@@ -65,6 +65,8 @@ def save_custom_language(chat_gpt_user, id):
 def new_diaolog(user):
     if Dialog.objects.filter(user=user, end=False).exists():
         Dialog.objects.filter(user=user, end=False).update(end=True)
+        for dialog in Dialog.objects.filter(user=user, end=False):
+            dialog.messages_dialog.update(end=True)
         return True
     else:
         return False
