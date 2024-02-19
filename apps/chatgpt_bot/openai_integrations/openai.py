@@ -83,8 +83,7 @@ def generate_prompt(user, message, bot_name):
     message = message.strip()
 
     print("message: ", message)
-    message = "Qisqa va aniq javob ber:" + message
-    promt = user.current_chat_mode.prompt_start
+    promt = user.current_chat_mode.prompt_start + "Please give a short answer."
     messages_list = [{"role": "system", "content": promt}]
     if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
