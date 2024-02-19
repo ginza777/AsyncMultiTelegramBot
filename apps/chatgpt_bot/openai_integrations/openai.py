@@ -76,6 +76,22 @@ def create_msg_token(user, token):
 
 
 @sync_to_async
+def check_msg_token(user):
+    if Dialog.objects.filter(user=user, end=False).exists():
+        dialog = Dialog.objects.filter(user=user, end=False).last()
+        dialog.save()
+    else:
+        dialog = Dialog.objects.create(
+            user=user,
+            chat_mode=user.current_chat_mode,
+            gpt_model=user.current_model,
+        )
+    if Messages_dialog.objects.filter(dialog=dialog, end=False).exists():
+        return False
+    return True
+
+
+@sync_to_async
 def generate_prompt(user, message, bot_name):
     message = message.replace(f"@{bot_name}", "")
     print("message: ", message)
@@ -131,7 +147,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
     print("messages: ", messages)
 
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
-    msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN)
+    msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN,reply_to_message_id=update.message.message_id)
 
     while answer is None:
         r_gen = openai.ChatCompletion.create(

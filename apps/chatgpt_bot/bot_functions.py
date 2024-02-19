@@ -26,7 +26,7 @@ from apps.chatgpt_bot.function.functions import (
 )
 from apps.chatgpt_bot.function.user_get_or_create import chat_gpt_user
 from apps.chatgpt_bot.models import Chat_mode, ChatGptUser, GptModels
-from apps.chatgpt_bot.openai_integrations.openai import send_message_stream
+from apps.chatgpt_bot.openai_integrations.openai import send_message_stream, check_msg_token
 from utils.decarators import get_member
 
 
@@ -199,6 +199,12 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     random_token=uuid.uuid4().hex
     print("random_token: ", random_token)
 
+    status=await check_msg_token(chat_gpt_user)
+    print("status: ", status)
+
+    if not status:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="You have not dialogue yet!",reply_to_message_id=update.message.message_id)
+        return
     await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context,random_token)
 
 
