@@ -1,4 +1,5 @@
 import uuid
+import time
 
 from asgiref.sync import sync_to_async
 from telegram import Update
@@ -203,9 +204,13 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     print("status: ", status)
 
     if not status:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="You have not dialogue yet!",reply_to_message_id=update.message.message_id)
-        return
-    await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context,random_token)
+        msg = await context.bot.send_message(chat_id=update.effective_chat.id, text="You have not dialogue yet!",reply_to_message_id=update.message.message_id)
+        #time sleep
+        time.sleep(1)
+        await update.message.delete()
+        await msg.delete()
+    else:
+        await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context,random_token)
 
 
 

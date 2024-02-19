@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 import environ
 import openai
@@ -11,6 +12,10 @@ from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_fro
 env = environ.Env()
 environ.Env.read_env()
 
+
+@sync_to_async
+def delete_messages(token):
+    Messages_dialog.objects.filter(msg_token=token).delete()
 
 @sync_to_async
 def create_msg(message, answer, user, input_tokens, output_tokens, random_token):
@@ -71,6 +76,7 @@ def create_msg_token(user, token):
         dialog=dialog,
         msg_token=token,
     )
+    message.save()
 
     return message.msg_token
 
@@ -99,7 +105,7 @@ def generate_prompt(user, message, bot_name):
     message = message.strip()
 
     print("message: ", message)
-    promt = user.current_chat_mode.prompt_start + "Please give a short answer."
+    promt = user.current_chat_mode.prompt_start + "\nPlease give a short answer."
     messages_list = [{"role": "system", "content": promt}]
     if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
@@ -109,9 +115,11 @@ def generate_prompt(user, message, bot_name):
 
         if Messages_dialog.objects.filter(dialog=dialog, end=True).count() > 0:
             print("messages count: ", Messages_dialog.objects.filter(dialog=dialog, end=True).count())
-            messages = Messages_dialog.objects.filter(dialog=dialog, end=True).order_by("created_at")[:1]
+            messages = list(Messages_dialog.objects.filter(dialog=dialog, end=True).order_by("-created_at")[:3])
+            messages.reverse()
+
             print("messages: ", messages)
-            if messages.count() > 0:
+            if messages:
                 for msg in messages:
                     messages_list.append({"role": "user", "content": msg.user})
                     messages_list.append({"role": "assistant", "content": msg.bot})
@@ -133,6 +141,9 @@ def generate_prompt(user, message, bot_name):
 
 
 async def send_message_stream(message, model_name, chat_token, user, update, context, random_token, *args, **kwargs):
+    #write to time.txt file
+    with open("time.txt", "a") as file:
+        file.write(f"{datetime.now()}\n")
     openai.api_key = env.str("OPENAI_API_KEY")
 
     def _postprocess_answer(answer):
@@ -147,53 +158,70 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
     print("messages: ", messages)
 
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
-    msg = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN,reply_to_message_id=update.message.message_id)
+    msg_dot = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN,
+                                             reply_to_message_id=update.message.message_id)
+    msg_message_id = msg_dot.message_id
+    msg_chat_id = update.message.chat_id
+    print("message_id: ", msg_message_id)
+    print("chat_id: ", msg_chat_id)
+    try:
+        while answer is None:
+            print("create time: ", datetime.now())
+            r_gen = openai.ChatCompletion.create(
+                model=model_name,
+                messages=messages,
+                stream=True,
+                temperature=0.7,
+                max_tokens=1000,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0,
+                timeout=600,
+            )
+            answer = ""
+            i = 1
+            for r_item in r_gen:
+                delta = r_item.choices[0].delta
+                if "content" in delta:
+                    answer += delta.content
+                    if len(answer) // 80 == i:
+                        msg = await context.bot.edit_message_text(
+                            chat_id=msg_chat_id,
+                            text=_postprocess_answer(answer),
+                            message_id=msg_message_id,
+                            parse_mode=ParseMode.MARKDOWN,
+                        )
+                        i += 1
+            msg = await context.bot.edit_message_text(
+                chat_id=msg_chat_id,
+                text=_postprocess_answer(answer),
+                message_id=msg_message_id,
+                parse_mode=ParseMode.MARKDOWN,
+            )
 
-    while answer is None:
-        r_gen = openai.ChatCompletion.create(
-            model=model_name,
-            messages=messages,
-            stream=True,
-            temperature=0.7,
-            max_tokens=1000,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-            timeout=600,
-        )
-        answer = ""
-        i = 1
-        for r_item in r_gen:
-            delta = r_item.choices[0].delta
-            if "content" in delta:
-                answer += delta.content
-                if len(answer) // 80 == i:
-                    msg = await context.bot.edit_message_text(
-                        chat_id=update.message.chat_id,
-                        text=_postprocess_answer(answer),
-                        message_id=msg.message_id,
-                        parse_mode=ParseMode.MARKDOWN,
-                    )
-                    i += 1
-        msg = await context.bot.edit_message_text(
-            chat_id=update.message.chat_id,
-            text=_postprocess_answer(answer),
-            message_id=msg.message_id,
+            model = user.current_model
+            input_message = messages
+            output_message = [{"role": "assistant", "content": answer}]
+
+            input_tokens = await num_tokens_from_messages(input_message, model_name)
+            output_tokens = await num_tokens_from_messages(output_message, model_name)
+
+            print("input_tokens: ", input_tokens)
+            print("output_tokens: ", output_tokens)
+            print("user: ", message)
+            print("assistant: ", answer)
+
+            await create_msg(message, answer, user, input_tokens, output_tokens, random_token)
+
+            return answer
+    except Exception as e:
+        print("error: ", e)
+        await context.bot.edit_message_text(
+            chat_id=msg_chat_id,
+            text="Sorry, I'm experiencing some issues. Please try again later.",
+            message_id=msg_message_id,
             parse_mode=ParseMode.MARKDOWN,
         )
+        await delete_messages(random_token)
 
-        model = user.current_model
-        input_message = messages
-        output_message = [{"role": "assistant", "content": answer}]
-
-        input_tokens = await num_tokens_from_messages(input_message, model_name)
-        output_tokens = await num_tokens_from_messages(output_message, model_name)
-
-        print("input_tokens: ", input_tokens)
-        print("output_tokens: ", output_tokens)
-        print("user: ", message)
-        print("assistant: ", answer)
-
-        await create_msg(message, answer, user, input_tokens, output_tokens, random_token)
-
-        return answer
+        return None
