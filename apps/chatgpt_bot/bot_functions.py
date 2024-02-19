@@ -1,6 +1,6 @@
 import asyncio
-import uuid
 import time
+import uuid
 
 from asgiref.sync import sync_to_async
 from telegram import Update
@@ -14,7 +14,6 @@ from apps.chatgpt_bot.buttons.inline_keyboard import (
     language_list_keyboard,
     main_setting_keyboard,
 )
-
 from apps.chatgpt_bot.buttons.keyboard import generate_keyboard
 from apps.chatgpt_bot.function.functions import (
     HELP_MESSAGE,
@@ -36,7 +35,7 @@ from utils.decarators import get_member
 @chat_gpt_user
 async def start(update: Update, context: CallbackContext, chat_gpt_user, *args, **kwargs):
     buttons = ["New_dialog", "Chat_mode", "Help"]
-    #buttons = ["My_account", "New_dialog", "Retry", "Chat_mode", "Settings", "Help", "About_us", "Contact_us"]
+    # buttons = ["My_account", "New_dialog", "Retry", "Chat_mode", "Settings", "Help", "About_us", "Contact_us"]
     my_list = buttons
     reply_markup = generate_keyboard(my_list)
 
@@ -184,34 +183,35 @@ async def is_bot_mentioned(update: Update, context: CallbackContext):
     else:
         return False
 
+
 async def process_user_message(update, context, chat_gpt_user, text, model_name, chat_token, random_token):
     # Bu funksiya sizning asosiy ishlaringizni bajaradi
     # send_message_stream va boshqa funksiyalarni chaqiring
     await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context, random_token)
 
+
 @get_member
 @chat_gpt_user
 async def message_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
-
     if chat_gpt_user.chat_id != 548115215:
         if not await is_bot_mentioned(update, context):
             return
 
-
-
     text = update.message.text
     model_name = await get_current_model(chat_gpt_user)
     chat_token = await get_user_token(chat_gpt_user)
-    random_token=uuid.uuid4().hex
+    random_token = uuid.uuid4().hex
     print("random_token: ", random_token)
 
-    status=await check_msg_token(chat_gpt_user)
+    status = await check_msg_token(chat_gpt_user)
     print("\n\n\n\status: ", status)
 
     if not status:
         print("You have pending message! can you wait or use command /new ?")
-        msg = await context.bot.send_message(chat_id=update.effective_chat.id, text="You have pending message! can you wait or use command /new ?",reply_to_message_id=update.message.message_id)
-        #time sleep
+        msg = await context.bot.send_message(chat_id=update.effective_chat.id,
+                                             text="You have pending message! can you wait or use command /new ?",
+                                             reply_to_message_id=update.message.message_id)
+        # time sleep
         time.sleep(1)
         await update.message.delete()
         await msg.delete()
@@ -233,7 +233,6 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
             print("Waiting for send message task to complete")
             await asyncio.sleep(5)  # Kutish uchun 1 soniya
         print("Send message task completed")
-
 
 
 @get_member
