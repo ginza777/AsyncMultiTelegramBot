@@ -17,6 +17,7 @@ environ.Env.read_env()
 def delete_messages(token):
     Messages_dialog.objects.filter(msg_token=token).delete()
 
+
 @sync_to_async
 def create_msg(message, answer, user, input_tokens, output_tokens, random_token):
     print("create_msg: ", random_token, message)
@@ -141,7 +142,7 @@ def generate_prompt(user, message, bot_name):
 
 
 async def send_message_stream(message, model_name, chat_token, user, update, context, random_token, *args, **kwargs):
-    #write to time.txt file
+    # write to time.txt file
     with open("time.txt", "a") as file:
         file.write(f"{datetime.now()}\n")
     openai.api_key = env.str("OPENAI_API_KEY")
