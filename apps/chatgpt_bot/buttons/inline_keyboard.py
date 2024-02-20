@@ -41,7 +41,7 @@ def main_setting_keyboard():
     button_list = [{"name": "🧠 AI Model", "id": 1}, {"name": "🇺🇸 Language", "id": 2}, {"name": "👮‍ Your name", "id": 3}]
     keyboard = []
     for button in button_list:
-        keyboard.append([InlineKeyboardButton(button["name"], callback_data=f"main_setting_{button["id"]}")])
+        keyboard.append([InlineKeyboardButton(button['name'], callback_data=f"main_setting_{button['id']}")])
     keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"delete_setting_back")])
     return InlineKeyboardMarkup(keyboard)
 
