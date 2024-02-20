@@ -21,7 +21,7 @@ ALTER ROLE sherzamon SET client_encoding TO 'utf8';
 ALTER ROLE sherzamon SET default_transaction_isolation TO 'read committed';
 ALTER ROLE sherzamon SET timezone TO 'UTC';
 
-GRANT ALL PRIVILEGES ON DATABASE ads TO sherzamon;
+GRANT ALL PRIVILEGES ON DATABASE all_bots TO sherzamon;
 
 pip install django gunicorn psycopg2-binary
 
