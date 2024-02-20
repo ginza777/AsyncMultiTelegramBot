@@ -71,6 +71,8 @@ WantedBy=multi-user.target
 
 sudo systemctl start bots.socket
 sudo systemctl enable bots.socket
+sudo systemctl restart bots.socket
+sudo systemctl status bots
 
 sudo systemctl status bots.socket
 file /run/bots.sock
