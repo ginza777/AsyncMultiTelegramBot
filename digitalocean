@@ -1,0 +1,128 @@
+sudo apt update
+sudo apt install nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+sudo systemctl status nginx
+sudo nginx -t
+sudo systemctl restart nginx
+apt install python3-virtualenv
+apt install redis-server
+
+
+sudo apt update
+sudo apt install python3-venv python3-dev libpq-dev postgresql postgresql-contrib nginx curl
+
+sudo -u postgres psql
+
+CREATE DATABASE all_bots;
+CREATE USER sherzamon WITH PASSWORD 'postgres';
+
+ALTER ROLE sherzamon SET client_encoding TO 'utf8';
+ALTER ROLE sherzamon SET default_transaction_isolation TO 'read committed';
+ALTER ROLE sherzamon SET timezone TO 'UTC';
+
+GRANT ALL PRIVILEGES ON DATABASE ads TO sherzamon;
+
+pip install django gunicorn psycopg2-binary
+
+
+python manage.py migrate
+python manage.py collectstatic
+python manage.py createsuperuser
+
+
+
+python manage.py runserver 0.0.0.0:8000
+pip install gunicorn
+
+sudo nano /etc/systemd/system/bots.socket
+
+[Unit]
+Description=gunicorn socket
+
+[Socket]
+ListenStream=/run/bots.sock
+
+[Install]
+WantedBy=sockets.target
+
+
+sudo nano /etc/systemd/system/bots.service
+
+
+[Unit]
+Description=gunicorn daemon
+Requires=bots.socket
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/projects/all_bots/AsyncMultiTelegramBot
+ExecStart=/var/projects/all_bots/env/bin/gunicorn \
+          --access-logfile - \
+          --workers 4 \
+          --bind unix:/run/bots.sock \
+          core.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl start bots.socket
+sudo systemctl enable bots.socket
+
+sudo systemctl status bots.socket
+file /run/bots.sock
+sudo journalctl -u bots.socket
+sudo systemctl status bots
+curl --unix-socket /run/bots.sock localhost
+sudo systemctl status bots
+sudo journalctl -u bots
+
+sudo systemctl daemon-reload
+sudo systemctl restart bots
+
+sudo nano /etc/nginx/sites-available/bot.sherzamon.cloud
+
+
+server {
+    listen 80;
+    server_name bot.sherzamon.cloud;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /var/projects/all_bots/AsyncMultiTelegramBot;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/bots.sock;
+    }
+}
+
+
+
+sudo ln -s /etc/nginx/sites-available/bot.sherzamon.cloud /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+journalctl -xeu nginx.service
+
+
+
+
+
+#certbot
+
+sudo apt install certbot python3-certbot-nginx
+sudo nano /etc/nginx/sites-available/bot.sherzamon.cloud
+sudo nginx -t
+sudo systemctl reload nginx
+sudo certbot --nginx -d bot.sherzamon.cloud
+sudo systemctl status certbot.timer
+sudo certbot renew --dry-run
+
+
+
+sudo nano /etc/systemd/system/celery_ads_manager_beat.service
+sudo nano /etc/systemd/system/celery_ads_manager_worker.service
