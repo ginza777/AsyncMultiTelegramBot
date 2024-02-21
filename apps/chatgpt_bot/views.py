@@ -66,7 +66,7 @@ async def setup(token):
     application.add_handler(CommandHandler("mode", show_chat_modes))
     application.add_handler(MessageHandler(filters.Regex(r"^Chat_mode$"), show_chat_modes))
     application.add_handler(CommandHandler("balance", user_balance))
-    application.add_handler(MessageHandler(filters.Regex(r"^My_balance$"), show_chat_modes))
+    application.add_handler(MessageHandler(filters.Regex(r"^My_balance$"), user_balance))
 
     application.add_handler(CommandHandler("settings", settings_handle))
     application.add_handler(MessageHandler(filters.Regex(r"^Settings$"), settings_handle))
