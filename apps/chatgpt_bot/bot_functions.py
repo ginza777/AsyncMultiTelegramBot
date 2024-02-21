@@ -58,7 +58,7 @@ async def user_balance(update: Update, context: CallbackContext, chat_gpt_user, 
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Your daily limit is not over yet! Please try again tomorrow!😀\n"
-                 f"🎃Kunlik limit: {count}\n"
+                 f"🎃Kunlik limit: {chat_gpt_user.daily_limit}\n"
                  f"🎃Foydalangan limit: {count}\n"
                  f"🎃Qolgan limit: {10-count}\n",
             parse_mode=ParseMode.HTML,
@@ -67,9 +67,9 @@ async def user_balance(update: Update, context: CallbackContext, chat_gpt_user, 
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"🔒Sizda kunlik limit tugagan! iltimos ertaga qayta urinib ko'ring!😢😢😢\n"
-                 f"🎈Kunlik limit: {count}\n"
+                 f"🎈Kunlik limit: {chat_gpt_user.daily_limit}\n"
                  f"🎈Foydalangan limit: {count}\n"
-                 f"🎈Qolgan limit: {10-count}\n",
+                 f"🎈Qolgan limit: 0\n",
             parse_mode=ParseMode.HTML,
         )
 
