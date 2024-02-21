@@ -4,7 +4,7 @@
 
 # Systemd xizmatlarini qayta boshlash
 
-
+git pull
 sudo systemctl start bots.socket
 sudo systemctl enable bots.socket
 sudo systemctl restart bots.socket
