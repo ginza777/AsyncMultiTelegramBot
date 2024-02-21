@@ -1,6 +1,6 @@
 import asyncio
-import time
 import uuid
+from datetime import datetime
 
 from asgiref.sync import sync_to_async
 from telegram import Update
@@ -26,7 +26,7 @@ from apps.chatgpt_bot.function.functions import (
     save_custom_language,
 )
 from apps.chatgpt_bot.function.user_get_or_create import chat_gpt_user
-from apps.chatgpt_bot.models import Chat_mode, ChatGptUser, GptModels
+from apps.chatgpt_bot.models import Chat_mode, ChatGptUser, GptModels, Messages_dialog
 from apps.chatgpt_bot.openai_integrations.openai import send_message_stream, check_msg_token
 from utils.decarators import get_member
 
@@ -190,12 +190,31 @@ async def process_user_message(update, context, chat_gpt_user, text, model_name,
     await send_message_stream(text, model_name, chat_token, chat_gpt_user, update, context, random_token)
 
 
+@sync_to_async
+def get_user_message_count_today(chat_gpt_user):
+    messages = Messages_dialog.objects.filter(dialog__user=chat_gpt_user, created_at__date=datetime.now().date())
+    print(100 * "=_=")
+    print("messages count: ", messages.count())
+    if messages.count() > 10:
+        return False
+    else:
+        return True
+
+
 @get_member
 @chat_gpt_user
 async def message_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
     if chat_gpt_user.chat_id != 548115215:
         if not await is_bot_mentioned(update, context):
             return
+
+    count = await get_user_message_count_today(chat_gpt_user)
+
+    if not count:
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text="Sizda kunlik limit tugagan! iltimos ertaga qayta urinib ko'ring!",
+                                       reply_to_message_id=update.message.message_id)
+        return
 
     text = update.message.text
     model_name = await get_current_model(chat_gpt_user)
@@ -212,17 +231,8 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
                                              text="You have pending message! can you wait or use command /new ?",
                                              reply_to_message_id=update.message.message_id)
         # time sleep
-        time.sleep(1)
-        await update.message.delete()
-        await msg.delete()
+        return
     else:
-        # workers = []
-        # for _ in range(3):
-        #     worker = process_user_message(update, context, chat_gpt_user, text, model_name, chat_token, random_token)
-        #     workers.append(worker)
-        #
-        # # Barcha ishchilarni boshlash
-        # await asyncio.gather(*workers)
         print("Ok ok ok")
         send_message_stream_task = asyncio.create_task(
             send_message_stream(
@@ -234,6 +244,51 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
             await asyncio.sleep(5)  # Kutish uchun 1 soniya
         print("Send message task completed")
 
+
+# @get_member
+# @chat_gpt_user
+# async def message_handle(update: Update, context: CallbackContext, chat_gpt_user: ChatGptUser, *args, **kwargs):
+#     if chat_gpt_user.chat_id != 548115215:
+#         if not await is_bot_mentioned(update, context):
+#             return
+#
+#     text = update.message.text
+#     model_name = await get_current_model(chat_gpt_user)
+#     chat_token = await get_user_token(chat_gpt_user)
+#     random_token = uuid.uuid4().hex
+#     print("random_token: ", random_token)
+#
+#     status = await check_msg_token(chat_gpt_user)
+#     print("\n\n\n\status: ", status)
+#
+#     if not status:
+#         print("You have pending message! can you wait or use command /new ?")
+#         msg = await context.bot.send_message(chat_id=update.effective_chat.id,
+#                                              text="You have pending message! can you wait or use command /new ?",
+#                                              reply_to_message_id=update.message.message_id)
+#         # time sleep
+#         time.sleep(1)
+#         # await update.message.delete()
+#         # await msg.delete()
+#     else:
+#         workers = []
+#         for _ in range(3):
+#             worker = process_user_message(update, context, chat_gpt_user, text, model_name, chat_token, random_token)
+#             workers.append(worker)
+#
+#         # Barcha ishchilarni boshlash
+#         await asyncio.gather(*workers)
+#         print("Ok ok ok")
+#         # send_message_stream_task = asyncio.create_task(
+#         #     send_message_stream(
+#         #         text, model_name, chat_token, chat_gpt_user, update, context, random_token
+#         #     )
+#         # )
+#         # while not send_message_stream_task.done():
+#         #     print("Waiting for send message task to complete")
+#         #     await asyncio.sleep(5)  # Kutish uchun 1 soniya
+#         # print("Send message task completed")
+#
 
 @get_member
 @chat_gpt_user

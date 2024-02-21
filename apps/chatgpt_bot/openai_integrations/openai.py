@@ -212,6 +212,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
             return answer
     except Exception as e:
         print("error: ", e)
+        msg_dot.delete()
         await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="Sorry, I'm experiencing some issues. Please try again later.",
