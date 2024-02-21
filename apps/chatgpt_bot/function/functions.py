@@ -8,11 +8,10 @@ from apps.chatgpt_bot.models import Dialog, Messages_dialog
 HELP_MESSAGE = str(
     _(
         """Commands:
-⚪️ /retry – Regenerate last bot answer
 ⚪️ /new – Start new dialog
 ⚪️ /mode – Select chat mode
 ⚪️ /settings – Show settings
-⚪️ /balance – Show balance
+⚪️ /balance – Show balance 
 ⚪️ /help – Show help
 
 🎨 Generate images from text prompts in <b>👩‍🎨 Artist</b> /mode

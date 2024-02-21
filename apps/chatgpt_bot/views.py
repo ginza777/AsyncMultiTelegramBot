@@ -83,8 +83,6 @@ async def setup(token):
     application.add_handler(CallbackQueryHandler(settings_handle, pattern="^delete_setting_back"))
 
     # application.add_handler(CommandHandler("help_group_chat", help_group_chat_handle))
-    # application.add_handler(CommandHandler("retry", retry_handle))
-    # application.add_handler(CommandHandler("cancel", cancel_handle))
     # application.add_handler(MessageHandler(filters.VOICE , voice_message_handle))
     # application.add_handler(CallbackQueryHandler(set_settings_handle, pattern="^set_settings"))
     # application.add_handler(CommandHandler("balance", show_balance_handle))
