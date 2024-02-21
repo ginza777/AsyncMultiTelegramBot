@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-
+import logging
 import environ
 import openai
 from asgiref.sync import sync_to_async
@@ -11,6 +11,9 @@ from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_fro
 
 env = environ.Env()
 environ.Env.read_env()
+
+#logging
+logger = logging.getLogger(__name__)
 
 
 @sync_to_async
@@ -106,7 +109,7 @@ def generate_prompt(user, message, bot_name):
     message = message.strip()
 
     print("message: ", message)
-    promt = user.current_chat_mode.prompt_start + "\nPlease give a short answer."
+    promt = user.current_chat_mode.prompt_start
     messages_list = [{"role": "system", "content": promt}]
     if Dialog.objects.filter(user=user, end=False).exists():
         dialog = Dialog.objects.filter(user=user, end=False).last()
@@ -143,8 +146,8 @@ def generate_prompt(user, message, bot_name):
 
 async def send_message_stream(message, model_name, chat_token, user, update, context, random_token, *args, **kwargs):
     # write to time.txt file
-    with open("time.txt", "a") as file:
-        file.write(f"{datetime.now()}\n")
+    # with open("time.txt", "a") as file:
+    #     file.write(f"{datetime.now()}\n")
     openai.api_key = env.str("OPENAI_API_KEY")
 
     def _postprocess_answer(answer):
@@ -159,7 +162,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
     print("messages: ", messages)
 
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
-    msg_dot = await context.bot.send_message(chat_id=update.message.chat_id, text="....", parse_mode=ParseMode.MARKDOWN,
+    msg_dot = await context.bot.send_message(chat_id=update.message.chat_id, text="⌛️Loading...", parse_mode=ParseMode.MARKDOWN,
                                              reply_to_message_id=update.message.message_id)
     msg_message_id = msg_dot.message_id
     msg_chat_id = update.message.chat_id
@@ -185,22 +188,14 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
                 delta = r_item.choices[0].delta
                 if "content" in delta:
                     answer += delta.content
-                    if len(answer) // 80 == i:
-                        msg = await context.bot.edit_message_text(
-                            chat_id=msg_chat_id,
-                            text=_postprocess_answer(answer),
-                            message_id=msg_message_id,
-                            parse_mode=ParseMode.MARKDOWN,
-                        )
-                        i += 1
-            msg = await context.bot.edit_message_text(
-                chat_id=msg_chat_id,
+
+            await context.bot.edit_message_text(
+                chat_id=update.message.chat_id,
                 text=_postprocess_answer(answer),
-                message_id=msg_message_id,
+                message_id=msg_dot.message_id,
                 parse_mode=ParseMode.MARKDOWN,
             )
-
-            model = user.current_model
+            print("answer: ", answer)
             input_message = messages
             output_message = [{"role": "assistant", "content": answer}]
 
@@ -217,11 +212,10 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
             return answer
     except Exception as e:
         print("error: ", e)
-        await context.bot.edit_message_text(
-            chat_id=msg_chat_id,
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
             text="Sorry, I'm experiencing some issues. Please try again later.",
-            message_id=msg_message_id,
-            parse_mode=ParseMode.MARKDOWN,
+            # parse_mode=ParseMode.MARKDOWN,
         )
         await delete_messages(random_token)
 
