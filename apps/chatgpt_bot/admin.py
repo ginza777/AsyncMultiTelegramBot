@@ -32,7 +32,7 @@ class TokenPackageAdmin(admin.ModelAdmin):
 
 @admin.register(ChatGptUser)
 class ChatGptUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "chat_id", "last_interaction", "current_chat_mode", "current_model")
+    list_display = ("id", "user", "chat_id", "last_interaction", "current_chat_mode", "current_model","daily_limit","extra_limit")
 
 
 @admin.register(Dialog)
