@@ -121,6 +121,9 @@ class ChatGptUser(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     language_choice = models.CharField(max_length=255, choices=Language.choices, default=Language.UZBEK, null=True)
+    daily_limit = models.IntegerField(default=10, null=True, blank=True)
+    extra_limit = models.IntegerField(default=0, null=True, blank=True)
+
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.user_token:

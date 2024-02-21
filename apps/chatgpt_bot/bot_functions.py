@@ -54,7 +54,7 @@ async def start(update: Update, context: CallbackContext, chat_gpt_user, *args, 
 async def user_balance(update: Update, context: CallbackContext, chat_gpt_user, *args, **kwargs):
     print("user_balance")
     count = await get_user_message_count(chat_gpt_user)
-    if count < 10:
+    if count < chat_gpt_user.daily_limit:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Your daily limit is not over yet! Please try again tomorrow!😀\n"
