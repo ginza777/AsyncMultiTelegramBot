@@ -3,7 +3,7 @@ from datetime import datetime
 from asgiref.sync import sync_to_async
 from django.utils.translation import gettext_lazy as _
 
-from apps.chatgpt_bot.models import Dialog, Messages_dialog
+from apps.chatgpt_bot.models import Dialog, Messages_dialog, ChatGptTokens
 
 HELP_MESSAGE = str(
     _(
@@ -35,7 +35,7 @@ IMPORTANT_MESSAGE = str(
 
 def split_text_into_chunks(text, chunk_size):
     """Split text into chunks of 500 characters."""
-    return [text[i : i + chunk_size] for i in range(0, len(text), chunk_size)]
+    return [text[i: i + chunk_size] for i in range(0, len(text), chunk_size)]
 
 
 @sync_to_async
@@ -91,9 +91,23 @@ def get_user_message_count_today(chat_gpt_user):
     else:
         return True
 
+
 @sync_to_async
 def get_user_message_count(chat_gpt_user):
     messages = Messages_dialog.objects.filter(dialog__user=chat_gpt_user, created_at__date=datetime.now().date())
     print(100 * "=_=")
     print("messages count: ", messages.count())
     return messages.count()
+
+
+@sync_to_async
+def get_openai_key():
+    import environ
+    env = environ.Env()
+    environ.Env.read_env()
+    if ChatGptTokens.objects.all().count() > 0:
+        token = ChatGptTokens.objects.last().token
+    else:
+        token = env.str("OPENAI_API_KEY")
+
+    return token

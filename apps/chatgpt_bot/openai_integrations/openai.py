@@ -1,19 +1,21 @@
+import logging
 import uuid
 from datetime import datetime
-import logging
+
 import environ
 import openai
 from asgiref.sync import sync_to_async
 from telegram.constants import ParseMode
 
 from apps.bot_main_setup.log_chat import send_msg
+from apps.chatgpt_bot.function.functions import get_openai_key
 from apps.chatgpt_bot.models import Dialog, Messages_dialog
 from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
 
 env = environ.Env()
 environ.Env.read_env()
 
-#logging
+# logging
 logger = logging.getLogger(__name__)
 
 
@@ -146,10 +148,8 @@ def generate_prompt(user, message, bot_name):
 
 
 async def send_message_stream(message, model_name, chat_token, user, update, context, random_token, *args, **kwargs):
-    # write to time.txt file
-    # with open("time.txt", "a") as file:
-    #     file.write(f"{datetime.now()}\n")
-    openai.api_key = env.str("OPENAI_API_KEY")
+    openai_key = await get_openai_key()
+    openai.api_key = openai_key
 
     def _postprocess_answer(answer):
         answer = answer.strip()
@@ -163,7 +163,8 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
     print("messages: ", messages)
 
     await context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
-    msg_dot = await context.bot.send_message(chat_id=update.message.chat_id, text="⌛️Loading...", parse_mode=ParseMode.MARKDOWN,
+    msg_dot = await context.bot.send_message(chat_id=update.message.chat_id, text="⌛️Loading...",
+                                             parse_mode=ParseMode.MARKDOWN,
                                              reply_to_message_id=update.message.message_id)
     msg_message_id = msg_dot.message_id
     msg_chat_id = update.message.chat_id
@@ -212,7 +213,10 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
 
             return answer
     except Exception as e:
-        await send_msg(message=e)
+        message = (f"Sorry, I'm experiencing some issues. Please try again later.\n"
+                   f"\ntoken:\n <b>{openai_key}</b>\n\n"
+                   f"gpt token error:\n {e}")
+        await send_msg(message)
         await msg_dot.delete()
         await context.bot.send_message(
             chat_id=update.message.chat_id,

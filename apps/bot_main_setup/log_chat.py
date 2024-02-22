@@ -1,8 +1,8 @@
+import requests
 from asgiref.sync import sync_to_async
 from django.utils import timezone
-import requests
 
-from apps.chatgpt_bot.models import ChatGptTokens
+from apps.chatgpt_bot.models import LogSenderBot
 
 
 def send_to_telegram(bot_token, chat_id, filename):
@@ -16,12 +16,13 @@ def send_to_telegram(bot_token, chat_id, filename):
 
 @sync_to_async
 def send_msg(message):
-    if ChatGptTokens.objects.count() > 0:
-        token = ChatGptTokens.objects.last().token
-        chat_id = ChatGptTokens.objects.last().chat_id
+    print("send_msg: ", message)
+    if LogSenderBot.objects.all().count() > 0:
+        token = LogSenderBot.objects.last().token
+        chat_id = LogSenderBot.objects.last().channel_id
     else:
         token = "6567332198:AAHRaGT5xLJdsJbWkugqgSJHbPGi8Zr2_ZI"
-        chat_id = -1004151170574
+        chat_id = -1002120483646
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     params = {
@@ -30,6 +31,7 @@ def send_msg(message):
         'parse_mode': 'HTML'
     }
     r = requests.post(url, data=params)
+    print("r: ", r.status_code)
     if r.status_code == 200:
         return True
     else:

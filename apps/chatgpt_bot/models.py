@@ -124,7 +124,6 @@ class ChatGptUser(models.Model):
     daily_limit = models.IntegerField(default=10, null=True, blank=True)
     extra_limit = models.IntegerField(default=0, null=True, blank=True)
 
-
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.user_token:
             self.user_token = uuid.uuid4()
@@ -166,8 +165,7 @@ class Messages_dialog(models.Model):
     msg_token = models.CharField(max_length=255, null=True, blank=True)
     input_tokens = models.IntegerField(default=0)
     output_tokens = models.IntegerField(default=0)
-    end= models.BooleanField(default=False)
-
+    end = models.BooleanField(default=False)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.msg_token:
@@ -203,17 +201,25 @@ class Config(models.Model):
 
 
 class ChatGptTokens(models.Model):
-    login= models.CharField(max_length=200, unique=True)
+    login = models.CharField(max_length=200, unique=True)
     password = models.CharField(max_length=200, unique=True)
-    token= models.CharField(max_length=200, unique=True)
+    token = models.CharField(max_length=200, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True)
 
+
 class LogSenderBot(models.Model):
-    token= models.CharField(max_length=200, unique=True)
-    channel_id= models.CharField(max_length=200, unique=True)
+    token = models.CharField(max_length=200, unique=True)
+    channel_id = models.CharField(max_length=200, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.channel_id.startswith('-'):
+            if self.channel_id.startswith('100'):
+                self.channel_id = '-' + self.channel_id
+            else:
+                self.channel_id = '-100' + self.channel_id
 
+        super().save(*args, **kwargs)
