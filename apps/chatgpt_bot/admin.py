@@ -11,7 +11,7 @@ from .models import (
     Messages_dialog,
     Subscribtion,
     TextModel,
-    TokenPackage,
+    TokenPackage, ChatGptTokens, LogSenderBot,
 )
 
 
@@ -80,3 +80,13 @@ class ConfigAdmin(admin.ModelAdmin):
 @admin.register(GptModels)
 class GptModelsAdmin(admin.ModelAdmin):
     list_display = ("model", "config")
+
+
+@admin.register(ChatGptTokens)
+class ChatGptTokensAdmin(admin.ModelAdmin):
+    list_display = ("token",)
+
+@admin.register(LogSenderBot)
+class LogSenderBotAdmin(admin.ModelAdmin):
+    list_display = ("id", "token", "channel_id",)
+

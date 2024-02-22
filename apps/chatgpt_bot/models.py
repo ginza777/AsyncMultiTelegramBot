@@ -200,3 +200,20 @@ class Config(models.Model):
     class Meta:
         verbose_name = "Config"
         verbose_name_plural = "Configs"
+
+
+class ChatGptTokens(models.Model):
+    login= models.CharField(max_length=200, unique=True)
+    password = models.CharField(max_length=200, unique=True)
+    token= models.CharField(max_length=200, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.BooleanField(default=True)
+
+class LogSenderBot(models.Model):
+    token= models.CharField(max_length=200, unique=True)
+    channel_id= models.CharField(max_length=200, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+

@@ -6,6 +6,7 @@ import openai
 from asgiref.sync import sync_to_async
 from telegram.constants import ParseMode
 
+from apps.bot_main_setup.log_chat import send_msg
 from apps.chatgpt_bot.models import Dialog, Messages_dialog
 from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
 
@@ -211,8 +212,8 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
 
             return answer
     except Exception as e:
-        print("error: ", e)
-        msg_dot.delete()
+        await send_msg(message=e)
+        await msg_dot.delete()
         await context.bot.send_message(
             chat_id=update.message.chat_id,
             text="Sorry, I'm experiencing some issues. Please try again later.",
