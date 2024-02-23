@@ -1,12 +1,13 @@
+import datetime
+
 import requests
 from asgiref.sync import sync_to_async
-from django.utils import timezone
 
 from apps.chatgpt_bot.models import LogSenderBot
 
 
-def send_to_telegram(bot_token, chat_id, filename,caption):
-    caption += f"\nDate: {timezone.now()}"
+def send_to_telegram(bot_token, chat_id, filename, caption):
+    caption += f"\nDate: {datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
     files = {'document': open(f"{filename}", 'rb')}
     data = {'chat_id': chat_id, 'caption': caption} if caption else {'chat_id': chat_id}
