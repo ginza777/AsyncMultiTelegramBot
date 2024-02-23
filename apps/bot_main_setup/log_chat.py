@@ -5,8 +5,8 @@ from django.utils import timezone
 from apps.chatgpt_bot.models import LogSenderBot
 
 
-def send_to_telegram(bot_token, chat_id, filename):
-    caption = f"Ads_manager Date: {timezone.now()}"
+def send_to_telegram(bot_token, chat_id, filename,caption):
+    caption += f"\nDate: {timezone.now()}"
     url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
     files = {'document': open(f"{filename}", 'rb')}
     data = {'chat_id': chat_id, 'caption': caption} if caption else {'chat_id': chat_id}

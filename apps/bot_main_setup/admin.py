@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import TelegramBot, TelegramProfile
+from .models import TelegramBot, TelegramProfile, BackupSenderBot
 
 
 @admin.register(TelegramBot)
@@ -12,3 +12,8 @@ class TelegramBotAdmin(admin.ModelAdmin):
 class TelegramProfileAdmin(admin.ModelAdmin):
     list_display = ("id", "first_name", "last_name", "username", "telegram_id", "language")
     filter_horizontal = ("bot",)
+
+
+@admin.register(BackupSenderBot)
+class BackupSenderBotAdmin(admin.ModelAdmin):
+    list_display = ("id", "token", "channel_id")
