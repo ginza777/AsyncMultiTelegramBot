@@ -59,7 +59,7 @@ class MessagesDialogAdmin(admin.ModelAdmin):
 
 @admin.register(Chat_mode)
 class ChatModeAdmin(admin.ModelAdmin):
-    list_display = ("key", "model_name", "model_type", "parse_mode", "created_at", "updated_at")
+    list_display = ("key", "model_name", "model_type", "parse_mode", "hidden","created_at", "updated_at")
 
 
 @admin.register(Config)

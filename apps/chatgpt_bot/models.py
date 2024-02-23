@@ -23,6 +23,7 @@ class Chat_mode(models.Model):
     extra_field = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    hidden= models.BooleanField(default=False)
 
     def __str__(self):
         return self.model_name

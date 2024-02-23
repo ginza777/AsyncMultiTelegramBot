@@ -6,7 +6,7 @@ from apps.chatgpt_bot.models import Chat_mode
 
 @sync_to_async
 def get_chat_modes_keyboard(page_index: int = 0, items_per_page: int = 5):
-    chat_modes = Chat_mode.objects.all()
+    chat_modes = Chat_mode.objects.filter(hidden=False).order_by("key")
     total_chat_modes = len(chat_modes)
 
     start_index = page_index * items_per_page
