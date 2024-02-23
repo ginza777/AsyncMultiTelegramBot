@@ -1,6 +1,7 @@
 import datetime
 import subprocess
 import environ
+import os
 from django.core.management.base import BaseCommand
 
 from apps.bot_main_setup.log_chat import send_to_telegram
@@ -29,9 +30,13 @@ def backup_database():
 
     # Dumpni olish uchun bash komandasi
     command = f"pg_dump -U {DB_USER} -h {DB_HOST} -p {DB_PORT} {DB_NAME} > {dump_file}"
-
+    os.environ['PGPASSWORD'] = DB_PASSWORD
     # Komandani bajarish
-    subprocess.run(command, shell=True)
+    try:
+        subprocess.run(command, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred while executing command: {e}")
+        return
     if BackupSenderBot.objects.all().count() > 0:
         token = BackupSenderBot.objects.last().token
         channel_id = BackupSenderBot.objects.last().channel_id
