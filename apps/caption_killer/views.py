@@ -21,7 +21,11 @@ async def cap_killer(update: Update, context: CallbackContext):
         new_caption = await filter_caption(caption, chat_id)
         # print(new_caption)
         try:
-            await context.bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_caption)
+            if Channel.objects.filter(channel_id=chat_id).exists():
+                await context.bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_caption)
+            else:
+                message = "adminga qo'shilmagan" + f"""{update.channel_post}"""
+                await send_msg_log(message)
         except Exception as e:
             logger.error(f"Error in start command: {e}")
             message = "caption killer bot\n" + f"Error in start command: {e}"
