@@ -23,7 +23,7 @@ def send_msg_log(message):
     max_length = 4096
 
     if LogSenderBot.objects.all().count() > 0:
-        token = LogSenderBot.objects.last().bot_token
+        token = LogSenderBot.objects.last().token
     else:
         token = "6567332198:AAHRaGT5xLJdsJbWkugqgSJHbPGi8Zr2_ZI"
     chat_id = -1002120483646
