@@ -19,5 +19,6 @@ class Command(BaseCommand):
         bots = TelegramBot.objects.all()
         for bot in bots:
             url = f"https://api.telegram.org/bot{bot.bot_token}/getWebhookInfo"
+            print(url)
             response = requests.post(url)
             print(response.json())
