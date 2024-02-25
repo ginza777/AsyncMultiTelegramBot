@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: CallbackContext,*args, **kwargs):
     print("start",update.effective_user.username )
     """Send a message asynchronously when the command /start is issued."""
-    message = "if you have some questions  click to => "+'<a href="https://t.me/+998939708050">ADMIN</a>'
+    message = "if you have some questions or questions about bot creation you can contact the creator via the link below => "+'<a href="https://t.me/+998939708050">ADMIN</a>'
     try:
         await update.message.reply_html(message)
     except Exception as e:
