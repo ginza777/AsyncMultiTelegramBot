@@ -13,7 +13,7 @@ class Language(models.TextChoices):
 
 
 class TelegramBot(models.Model):
-    name = models.CharField(max_length=30, null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
     bot_token = models.CharField(max_length=255, unique=True)
     bot_username = models.CharField(max_length=125, blank=True, null=True)
     app_name = models.CharField(max_length=255)
