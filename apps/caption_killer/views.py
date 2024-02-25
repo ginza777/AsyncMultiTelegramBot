@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 async def cap_killer(update: Update, context: CallbackContext):
-    time.sleep(1)
+    time.sleep(2)
     """Send a message asynchronously when the command /start is issued."""
     if update.channel_post and update.channel_post.chat.type == "channel":
         print("this is channel message")
