@@ -1,5 +1,6 @@
 # Create your views here.
 import logging
+import time
 
 from asgiref.sync import sync_to_async
 from telegram import Update
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 async def cap_killer(update: Update, context: CallbackContext):
+    time.sleep(1)
     """Send a message asynchronously when the command /start is issued."""
     if update.channel_post and update.channel_post.chat.type == "channel":
         print("this is channel message")
