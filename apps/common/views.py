@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 @get_member
 async def start(update: Update, context: CallbackContext):
+    print("start",update.effective_user.username )
     """Send a message asynchronously when the command /start is issued."""
     message = "if you have some questions  click to => "+'<a href="https://t.me/+998939708050">ADMIN</a>'
     try:
