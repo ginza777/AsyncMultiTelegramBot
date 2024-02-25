@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 @get_member
-async def start(update: Update, context: CallbackContext, tg_user: TelegramProfile):
+async def start(update: Update, context: CallbackContext):
     """Send a message asynchronously when the command /start is issued."""
-
+    message = "if you have some questions  click to => "+'<a href="https://t.me/+998939708050">ADMIN</a>'
     try:
-        await update.message.reply_text("Assalomu alaykum, common bot ishladi")
+        await update.message.reply_html(message)
     except Exception as e:
         logger.error(f"Error in start command: {e}")

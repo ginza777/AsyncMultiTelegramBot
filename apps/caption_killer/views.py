@@ -21,7 +21,7 @@ async def cap_killer(update: Update, context: CallbackContext):
 
         # print(new_caption)
         try:
-            status=await exist_checker(chat_id)
+            status = await exist_checker(chat_id)
             if status:
                 new_caption = await filter_caption(caption, chat_id)
                 await context.bot.edit_message_caption(chat_id=chat_id, message_id=message_id, caption=new_caption)
