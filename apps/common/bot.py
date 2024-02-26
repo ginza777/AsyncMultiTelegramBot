@@ -1,32 +1,50 @@
 import os
-
+from apps.common.views import start as about
 from django.conf import settings
-from telegram import Bot
-from telegram.ext import Application, CommandHandler, ConversationHandler, MessageHandler, PicklePersistence
+from telegram import Bot, BotCommand
+from telegram.ext import Application, CommandHandler, MessageHandler, PicklePersistence, \
+    ApplicationBuilder, filters
 
 from apps.common.views import start
 
 
+async def post_init(application: Application):
+    print("post_init function is called.")
+    await application.bot.set_my_commands(
+        [
+            BotCommand("/start", "Start bot"),
+            BotCommand("/new", "Start new dialog"),
+            BotCommand("/mode", "Select chat mode"),
+            BotCommand("/retry", "Re-generate response for previous query"),
+            BotCommand("/balance", "Show balance"),
+            BotCommand("/settings", "Show settings"),
+            BotCommand("/help", "Show help message"),
+        ]
+    )
+
+
 async def setup(token):
-    print("common setup process...")
+    print("caption killer setup process...")
     persistence_file = os.path.join(settings.BASE_DIR, "media", "state_record", "conversationbot.pickle")
     persistence = PicklePersistence(filepath=persistence_file)
     bot = Bot(token=token)
     await bot.initialize()
-
-    application = Application.builder().token(token).persistence(persistence).build()
-
-    states = {}
-    entry_points = [CommandHandler("start", start)]
-    fallbacks = [MessageHandler(filters=None, callback=start)]
-
-    conversation_handler = ConversationHandler(
-        entry_points=entry_points,
-        states=states,
-        fallbacks=fallbacks,
-        persistent=True,
-        name="conversationbot",
+    application = (
+        ApplicationBuilder()
+        .token(token)
+        .concurrent_updates(True)
+        .http_version("1.1")
+        .get_updates_http_version("1.1")
+        .post_init(post_init)
+        .persistence(persistence)
+        .build()
     )
-    application.add_handler(conversation_handler)
+    application.add_handler(CommandHandler("about", about))
+    application.add_handler(CommandHandler("start", start))
+    # application.add_handler(MessageHandler(filters.Regex(r"^Start$"), start))
+
+    # # callback
+    # application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))
+
     await application.initialize()
     return application, bot

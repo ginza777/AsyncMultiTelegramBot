@@ -50,6 +50,7 @@ CUSTOM_APPS = [
     "apps.bot_main_setup",
     "apps.chatgpt_bot",
     "apps.caption_killer",
+    "apps.translator_bot",
 ]
 
 THIRD_PARTY_APPS = [

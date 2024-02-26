@@ -8,6 +8,7 @@ from apps.bot_main_setup.models import TelegramBot
 from apps.chatgpt_bot.views import setup as setup_chatgpt
 from apps.caption_killer.bot import setup as caption_killer
 from apps.common.bot import setup as setup_common
+from apps.translator_bot.bot import setup as setup_translator
 
 
 @sync_to_async
@@ -37,11 +38,12 @@ async def setup_choice(bot_token):
     elif app_name == "setup_common":
         print("choiced setup_common")
         return setup_common
-    elif app_name== "setup_caption_killer":
-        print("setup_choiced caption_killer")
+    elif app_name == "setup_caption_killer":
+        print("choiced caption_killer")
         return caption_killer
-    return setup_common
-
+    elif app_name == "setup_translator":
+        print("choiced setup_translator")
+    return setup_translator
 
 
 async def handle_telegram_webhook(request, bot_token):
