@@ -5,7 +5,6 @@ from telegram import Bot, BotCommand
 from telegram.ext import Application, CommandHandler, MessageHandler, PicklePersistence, \
     ApplicationBuilder, filters
 
-from apps.common.views import start
 
 
 async def post_init(application: Application):
@@ -40,7 +39,7 @@ async def setup(token):
         .build()
     )
     application.add_handler(CommandHandler("about", about))
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("start", about))
     # application.add_handler(MessageHandler(filters.Regex(r"^Start$"), start))
 
     # # callback

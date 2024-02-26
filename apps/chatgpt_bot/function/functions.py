@@ -13,6 +13,7 @@ HELP_MESSAGE = str(
 ⚪️ /settings – Show settings
 ⚪️ /balance – Show balance 
 ⚪️ /help – Show help
+⚪️ /about – About creator
 
 🎨 Generate images from text prompts in <b>👩‍🎨 Artist</b> /mode
 👥 Add bot to <b>group chat</b>: /help_group_chat
