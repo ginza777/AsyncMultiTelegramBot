@@ -4,7 +4,7 @@ from django.conf import settings
 from telegram import Bot, BotCommand
 from telegram.ext import Application, CommandHandler, MessageHandler, PicklePersistence, \
     ApplicationBuilder, filters
-from apps.translator_bot.views import start,translator
+from apps.translator_bot.views import start
 from apps.common.views import start as about
 
 async def post_init(application: Application):
