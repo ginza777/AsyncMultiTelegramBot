@@ -41,7 +41,7 @@ async def setup(token):
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("about", about))
-    application.add_handler(MessageHandler(filters.ALL, translator))
+    # application.add_handler(MessageHandler(filters.ALL, translator))
 
     # # callback
     # application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))
