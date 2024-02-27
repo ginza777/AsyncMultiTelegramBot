@@ -196,7 +196,6 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
                 text=_postprocess_answer(answer),
                 message_id=msg_dot.message_id,
                 parse_mode=ParseMode.MARKDOWN,
-                action="typing",
             )
             print("answer: ", answer)
             input_message = messages
@@ -214,14 +213,15 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
 
             return answer
     except Exception as e:
-        message = (f"Sorry, I'm experiencing some issues. Please try again later.\n"
+        message = (f"ChatGPT bot error:\n"
+                   f"Sorry, I'm experiencing some issues. Please try again later.\n"
                    f"\ntoken:\n <b>{openai_key}</b>\n\n"
                    f"gpt token error:\n {e}")
         await send_msg_log(message)
         await msg_dot.delete()
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text="Sorry, I'm experiencing some issues. Please try again later.",
+            text="Sorry, I'm experiencing some issues. Please try again later.",action="typing",
             # parse_mode=ParseMode.MARKDOWN,
         )
         await delete_messages(random_token)
