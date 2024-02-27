@@ -109,7 +109,7 @@ async def set_native_lang(update: Update, context: CallbackContext, translator_u
     lang_name = next((item["name"] for item in language_list if item["id"] == lang), None)
     await set_lang(translator_user, lang, True)
     if lang_name:
-        await query.edit_message_text("Native language has been set to " + lang_name,
+        await query.edit_message_text("Native language has been set to " + lang_name+"\nPlease select your target language",
                                       reply_markup=language_list_keyboard("target"))
         await query.answer("Language has been set to " + lang_name)
     else:
