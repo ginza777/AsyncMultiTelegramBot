@@ -1,11 +1,32 @@
 import os
-
+from apps.common.views import start as about
 from django.conf import settings
 from telegram import Bot, BotCommand
-from telegram.ext import Application, CommandHandler, MessageHandler, PicklePersistence, \
-    ApplicationBuilder, filters
-from apps.translator_bot.views import start
-from apps.common.views import start as about
+from telegram.ext import (
+    Application,
+    ApplicationBuilder,
+    CallbackQueryHandler,
+    CommandHandler,
+    MessageHandler,
+    PicklePersistence,
+    filters,
+)
+
+from apps.chatgpt_bot.bot_functions import (
+    help,
+    language_choice_handle,
+    message_handle,
+    new_dialog_handle,
+    set_chat_modes_callback_handle,
+    settings_choice_handle,
+    settings_handle,
+    show_chat_modes,
+    show_chat_modes_callback_handle,
+    start,
+    user_balance,
+)
+from apps.translator_bot.views import start, translator, set_target_lang,set_native_lang,settings_user,change_native_lang
+
 
 async def post_init(application: Application):
     print("post_init function is called.")
@@ -40,8 +61,23 @@ async def setup(token):
     )
 
     application.add_handler(CommandHandler("start", start))
+
     application.add_handler(CommandHandler("about", about))
-    # application.add_handler(MessageHandler(filters.ALL, translator))
+    application.add_handler(CallbackQueryHandler(start, pattern="^setting_back_to_native_lang"))
+    application.add_handler(CallbackQueryHandler(set_target_lang, pattern="^language_target_"))
+    application.add_handler(CallbackQueryHandler(set_native_lang, pattern="^language_native_"))
+
+    application.add_handler(CommandHandler("settings", settings_user))
+    application.add_handler(CallbackQueryHandler(settings_user, pattern="^language_reset_native_"))
+    application.add_handler(CallbackQueryHandler(settings_user, pattern="^language_reset_target_"))
+    application.add_handler(CallbackQueryHandler(settings_user, pattern="^change_lang_native"))
+    application.add_handler(CallbackQueryHandler(settings_user, pattern="^change_lang_target"))
+    application.add_handler(MessageHandler(filters.Regex(r"^Change Language$"), settings_user))
+    application.add_handler(MessageHandler(filters.Regex(r"^About$"), about))
+    application.add_handler(MessageHandler(filters.Regex(r"^Restart$"), start))
+    application.add_handler(MessageHandler(filters.Regex(r"^History conversation$"), start))
+
+    application.add_handler(MessageHandler(filters.ALL, translator))
 
     # # callback
     # application.add_handler(CallbackQueryHandler(show_chat_modes_callback_handle, pattern="^show_chat_modes"))

@@ -10,3 +10,4 @@ django-rosetta==0.10.0
 python-telegram-bot==20.7
 aiohttp==3.9.1
 channels==4.0.0
+google-cloud-translate
