@@ -219,7 +219,7 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
     if not count:
         await context.bot.send_message(chat_id=update.effective_chat.id,
                                        text="Sizda kunlik limit tugagan! iltimos ertaga qayta urinib ko'ring!",
-                                       reply_to_message_id=update.message.message_id)
+                                       reply_to_message_id=update.message.message_id,action="typing")
         return
 
     text = update.message.text
@@ -233,9 +233,9 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
 
     if not status:
         print("You have pending message! can you wait or use command /new ?")
-        msg = await context.bot.send_message(chat_id=update.effective_chat.id,
+        await context.bot.send_message(chat_id=update.effective_chat.id,
                                              text="You have pending message! can you wait or use command /new ?",
-                                             reply_to_message_id=update.message.message_id)
+                                             reply_to_message_id=update.message.message_id,action="typing")
         # time sleep
         return
     else:

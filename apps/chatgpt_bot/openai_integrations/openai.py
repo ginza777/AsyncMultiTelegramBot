@@ -7,7 +7,7 @@ import openai
 from asgiref.sync import sync_to_async
 from telegram.constants import ParseMode
 
-from apps.bot_main_setup.log_chat import send_msg
+from apps.bot_main_setup.log_chat import send_msg_log
 from apps.chatgpt_bot.function.functions import get_openai_key
 from apps.chatgpt_bot.models import Dialog, Messages_dialog
 from apps.chatgpt_bot.openai_integrations.token_calculator import num_tokens_from_messages
@@ -196,6 +196,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
                 text=_postprocess_answer(answer),
                 message_id=msg_dot.message_id,
                 parse_mode=ParseMode.MARKDOWN,
+                action="typing",
             )
             print("answer: ", answer)
             input_message = messages
@@ -216,7 +217,7 @@ async def send_message_stream(message, model_name, chat_token, user, update, con
         message = (f"Sorry, I'm experiencing some issues. Please try again later.\n"
                    f"\ntoken:\n <b>{openai_key}</b>\n\n"
                    f"gpt token error:\n {e}")
-        await send_msg(message)
+        await send_msg_log(message)
         await msg_dot.delete()
         await context.bot.send_message(
             chat_id=update.message.chat_id,
