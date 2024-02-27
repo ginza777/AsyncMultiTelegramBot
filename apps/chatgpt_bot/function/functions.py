@@ -87,7 +87,7 @@ def get_user_message_count_today(chat_gpt_user):
     messages = Messages_dialog.objects.filter(dialog__user=chat_gpt_user, created_at__date=datetime.now().date())
     print(100 * "=_=")
     print("messages count: ", messages.count())
-    if messages.count() > chat_gpt_user.daily_limit:
+    if messages.count() >= chat_gpt_user.daily_limit:
         return False
     else:
         return True

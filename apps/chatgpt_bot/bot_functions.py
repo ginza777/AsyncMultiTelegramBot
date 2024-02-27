@@ -218,7 +218,7 @@ async def message_handle(update: Update, context: CallbackContext, chat_gpt_user
 
     if not count:
         await context.bot.send_message(chat_id=update.effective_chat.id,
-                                       text="Sizda kunlik limit tugagan! iltimos ertaga qayta urinib ko'ring!",
+                                       text="Sizda kunlik limit tugagan! iltimos ertaga qayta urinib ko'ring! /balance",
                                        reply_to_message_id=update.message.message_id)
         return
 
