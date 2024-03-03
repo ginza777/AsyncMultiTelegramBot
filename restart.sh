@@ -5,9 +5,9 @@
 # Systemd xizmatlarini qayta boshlash
 
 git pull
-sudo systemctl start bots.socket
-sudo systemctl enable bots.socket
-sudo systemctl restart bots.socket
-sudo systemctl restart bots.service
+sudo systemctl start djangofather.socket
+sudo systemctl enable djangofather.socket
+sudo systemctl restart djangofather.socket
+sudo systemctl restart djangofather.service
 sudo systemctl daemon-reload
 sudo nginx -t && sudo systemctl restart nginx

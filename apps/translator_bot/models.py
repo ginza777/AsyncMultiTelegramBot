@@ -7,8 +7,8 @@ class TranslatorUser(models.Model):
     user = models.ForeignKey(
         TelegramProfile, on_delete=models.SET_NULL, verbose_name="Translator User", null=True, blank=True
     )
-    native_language = models.CharField(max_length=10, null=True, blank=True, default='uz')
-    target_language = models.CharField(max_length=10, null=True, blank=True, default='en')
+    native_language = models.CharField(max_length=10, null=True, blank=True, default='no_lang')
+    target_language = models.CharField(max_length=10, null=True, blank=True, default='no_lang')
 
 
 
